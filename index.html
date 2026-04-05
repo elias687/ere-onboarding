@@ -774,20 +774,136 @@ h2{
 <div class="screen" id="screen-q1">
   <div class="question-meta">
     <span class="question-num">Question 1</span>
-    <span class="question-count">1 / 4</span>
+    <span class="question-count">1 / 6</span>
   </div>
-  <h2 class="question-text">Quel est l'objectif<br>principal de cette video ?</h2>
-  <p class="question-hint">Ce que vous voulez que le spectateur fasse ou ressente.</p>
+  <h2 class="question-text">Quel est l'objectif<br>de cette video ?</h2>
+  <p class="question-hint">Ce que vous voulez que le spectateur fasse ou ressente apres avoir regarde.</p>
 
   <div class="option-grid">
-    <div class="option-card" onclick="selectOption(this)"><span class="option-emoji">🚀</span> Notoriete / Lancement<span class="option-check">✓</span></div>
-    <div class="option-card" onclick="selectOption(this)"><span class="option-emoji">💼</span> Vente / Conversion<span class="option-check">✓</span></div>
-    <div class="option-card" onclick="selectOption(this)"><span class="option-emoji">🎓</span> Formation / Explication<span class="option-check">✓</span></div>
-    <div class="option-card" onclick="selectOption(this)"><span class="option-emoji">✨</span> Image de marque<span class="option-check">✓</span></div>
+    <div class="option-card" onclick="selectOption(this)">
+      <span class="option-emoji">📣</span>
+      <div style="flex:1;">
+        <div style="font-weight:600;font-size:14px;">Trafic payant (Ads)</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;">Meta, TikTok, YouTube Ads</div>
+      </div>
+      <span class="option-check">✓</span>
+    </div>
+    <div class="option-card" onclick="selectOption(this)">
+      <span class="option-emoji">📱</span>
+      <div style="flex:1;">
+        <div style="font-weight:600;font-size:14px;">Community Management</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;">Contenu social media recurrent</div>
+      </div>
+      <span class="option-check">✓</span>
+    </div>
+    <div class="option-card" onclick="selectOption(this)">
+      <span class="option-emoji">🎓</span>
+      <div style="flex:1;">
+        <div style="font-weight:600;font-size:14px;">Video explicative</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;">Interne, onboarding, formation</div>
+      </div>
+      <span class="option-check">✓</span>
+    </div>
+    <div class="option-card" onclick="selectOption(this)">
+      <span class="option-emoji">✨</span>
+      <div style="flex:1;">
+        <div style="font-weight:600;font-size:14px;">Brand Content</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;">Image de marque, storytelling</div>
+      </div>
+      <span class="option-check">✓</span>
+    </div>
+    <div class="option-card" onclick="selectOption(this)">
+      <span class="option-emoji">🚀</span>
+      <div style="flex:1;">
+        <div style="font-weight:600;font-size:14px;">Lancement produit</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;">Teaser, reveal, campagne</div>
+      </div>
+      <span class="option-check">✓</span>
+    </div>
+    <div class="option-card" onclick="selectOption(this)">
+      <span class="option-emoji">💡</span>
+      <div style="flex:1;">
+        <div style="font-weight:600;font-size:14px;">Autre</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;">Je preciserai dans les questions</div>
+      </div>
+      <span class="option-check">✓</span>
+    </div>
   </div>
 
   <div class="form-nav">
     <button class="btn-back" onclick="goBack()" title="Retour">← Retour</button>
+    <button class="btn btn-primary" onclick="goToStep('q1b')" style="flex:1;">Suivant →</button>
+  </div>
+</div>
+
+<!-- ══ SCREEN Q1B : PLATEFORME DE DIFFUSION ══ -->
+<div class="screen" id="screen-q1b">
+  <div class="question-meta">
+    <span class="question-num">Question 2</span>
+    <span class="question-count">2 / 6</span>
+  </div>
+  <h2 class="question-text">Ou sera diffusee<br>cette video ?</h2>
+  <p class="question-hint">Choisissez toutes les plateformes concernees. Le format sera adapte en consequence.</p>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px;">
+    <div class="option-card" style="flex-direction:column;align-items:center;text-align:center;gap:6px;padding:16px 10px;" onclick="togglePlatform(this)">
+      <span style="font-size:26px;">📸</span>
+      <div style="font-size:12px;font-weight:700;">Instagram</div>
+      <div style="font-size:10px;color:var(--muted);">Reels / Stories / Feed</div>
+      <span class="option-check" style="margin:0;">✓</span>
+    </div>
+    <div class="option-card" style="flex-direction:column;align-items:center;text-align:center;gap:6px;padding:16px 10px;" onclick="togglePlatform(this)">
+      <span style="font-size:26px;">💼</span>
+      <div style="font-size:12px;font-weight:700;">LinkedIn</div>
+      <div style="font-size:10px;color:var(--muted);">Posts / Sponsored</div>
+      <span class="option-check" style="margin:0;">✓</span>
+    </div>
+    <div class="option-card" style="flex-direction:column;align-items:center;text-align:center;gap:6px;padding:16px 10px;" onclick="togglePlatform(this)">
+      <span style="font-size:26px;">🎵</span>
+      <div style="font-size:12px;font-weight:700;">TikTok</div>
+      <div style="font-size:10px;color:var(--muted);">Organic / Ads</div>
+      <span class="option-check" style="margin:0;">✓</span>
+    </div>
+    <div class="option-card" style="flex-direction:column;align-items:center;text-align:center;gap:6px;padding:16px 10px;" onclick="togglePlatform(this)">
+      <span style="font-size:26px;">▶️</span>
+      <div style="font-size:12px;font-weight:700;">YouTube</div>
+      <div style="font-size:10px;color:var(--muted);">Pre-roll / Chaîne</div>
+      <span class="option-check" style="margin:0;">✓</span>
+    </div>
+    <div class="option-card" style="flex-direction:column;align-items:center;text-align:center;gap:6px;padding:16px 10px;" onclick="togglePlatform(this)">
+      <span style="font-size:26px;">🌐</span>
+      <div style="font-size:12px;font-weight:700;">Site web</div>
+      <div style="font-size:10px;color:var(--muted);">Homepage / Landing</div>
+      <span class="option-check" style="margin:0;">✓</span>
+    </div>
+    <div class="option-card" style="flex-direction:column;align-items:center;text-align:center;gap:6px;padding:16px 10px;" onclick="togglePlatform(this)">
+      <span style="font-size:26px;">📧</span>
+      <div style="font-size:12px;font-weight:700;">Email / CRM</div>
+      <div style="font-size:10px;color:var(--muted);">Newsletter / Sequence</div>
+      <span class="option-check" style="margin:0;">✓</span>
+    </div>
+    <div class="option-card" style="flex-direction:column;align-items:center;text-align:center;gap:6px;padding:16px 10px;" onclick="togglePlatform(this)">
+      <span style="font-size:26px;">📺</span>
+      <div style="font-size:12px;font-weight:700;">Meta Ads</div>
+      <div style="font-size:10px;color:var(--muted);">Facebook / Instagram</div>
+      <span class="option-check" style="margin:0;">✓</span>
+    </div>
+    <div class="option-card" style="flex-direction:column;align-items:center;text-align:center;gap:6px;padding:16px 10px;" onclick="togglePlatform(this)">
+      <span style="font-size:26px;">🎤</span>
+      <div style="font-size:12px;font-weight:700;">Evenement</div>
+      <div style="font-size:10px;color:var(--muted);">Salon / Conference</div>
+      <span class="option-check" style="margin:0;">✓</span>
+    </div>
+    <div class="option-card" style="flex-direction:column;align-items:center;text-align:center;gap:6px;padding:16px 10px;" onclick="togglePlatform(this)">
+      <span style="font-size:26px;">🔒</span>
+      <div style="font-size:12px;font-weight:700;">Usage interne</div>
+      <div style="font-size:10px;color:var(--muted);">RH / Formation / Pitch</div>
+      <span class="option-check" style="margin:0;">✓</span>
+    </div>
+  </div>
+
+  <div class="form-nav">
+    <button class="btn-back" onclick="goToStep('q1')" title="Retour">← Retour</button>
     <button class="btn btn-primary" onclick="goToStep('q2')" style="flex:1;">Suivant →</button>
   </div>
 </div>
@@ -795,8 +911,8 @@ h2{
 <!-- ══ SCREEN Q2 : AUDIENCE ══ -->
 <div class="screen" id="screen-q2">
   <div class="question-meta">
-    <span class="question-num">Question 2</span>
-    <span class="question-count">2 / 4</span>
+    <span class="question-num">Question 3</span>
+    <span class="question-count">3 / 6</span>
   </div>
   <h2 class="question-text">Qui est votre<br>audience cible ?</h2>
   <p class="question-hint">Secteur, age, poste, habitudes. Soyez precis.</p>
@@ -807,7 +923,24 @@ h2{
   </div>
 
   <div id="q2-text-input">
-    <textarea class="answer-textarea" id="q2-text" placeholder="Ex : Directeurs marketing de PME tech (10-50 salaries), 30-45 ans, actifs sur LinkedIn..." rows="5"></textarea>
+    <textarea class="answer-textarea" id="q2-text" placeholder="Ex : DAF d'une ETI parisienne, DSI grand compte, DG d'une agence..." rows="4"></textarea>
+
+  <!-- SUGGESTIONS CIBLES -->
+  <div style="margin-top:10px;">
+    <div style="font-size:11px;color:var(--muted);margin-bottom:8px;font-weight:500;text-transform:uppercase;letter-spacing:0.08em;">Cibles frequentes agences Paris</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;">
+      <div class="ref-example-pill" onclick="insertTarget('Directeur marketing, grands comptes B2B, Paris')">Directeur Marketing</div>
+      <div class="ref-example-pill" onclick="insertTarget('Responsable communication, PME/ETI, Ile-de-France')">Responsable Comm</div>
+      <div class="ref-example-pill" onclick="insertTarget('DAF / Direction financiere, groupes CAC40')">DAF Grand Compte</div>
+      <div class="ref-example-pill" onclick="insertTarget('DRH, entreprises +500 salaries, secteur tertiaire')">DRH Entreprise</div>
+      <div class="ref-example-pill" onclick="insertTarget('Chef de produit / Product Manager, startups tech parisiennes')">Product Manager Tech</div>
+      <div class="ref-example-pill" onclick="insertTarget('Direction generale, agences de communication et publicite parisiennes')">DG Agence Pub</div>
+      <div class="ref-example-pill" onclick="insertTarget('Directeur artistique / Directeur de creation, studios et agences')">DA / Directeur Crea</div>
+      <div class="ref-example-pill" onclick="insertTarget('Acheteur media, trading desks, agences media parisiennes')">Acheteur Media</div>
+      <div class="ref-example-pill" onclick="insertTarget('Responsable digital / Social media manager, marques retail et luxe')">Social Media Manager</div>
+      <div class="ref-example-pill" onclick="insertTarget('DSI / CTO, scale-ups et grands groupes, secteur finance et assurance')">DSI / CTO</div>
+    </div>
+  </div>
   </div>
   <div id="q2-voice-input" style="display:none;">
     <div class="voice-zone">
@@ -833,8 +966,8 @@ h2{
 <!-- ══ SCREEN Q3 : DETAILS ══ -->
 <div class="screen" id="screen-q3">
   <div class="question-meta">
-    <span class="question-num">Questions 3 – 4</span>
-    <span class="question-count">3–4 / 4</span>
+    <span class="question-num">Questions 4 – 5</span>
+    <span class="question-count">4–5 / 6</span>
   </div>
   <h2 class="question-text">Message & format</h2>
   <p class="question-hint">Les elements techniques qui cadrent la production.</p>
@@ -1103,8 +1236,8 @@ var refs = [];
 var selectedContexts = 0;
 var formAnswers = {};
 
-var progressMap = {'1':8,'2a':22,'q1':36,'q2':50,'q3':60,'refs':70,'refs2':82,'ai':92,'result':100};
-var dotMap = {'1':1,'2a':2,'q1':2,'q2':3,'q3':3,'refs':4,'refs2':4,'ai':5,'result':5};
+var progressMap = {'1':8,'2a':18,'q1':28,'q1b':38,'q2':48,'q3':58,'refs':68,'refs2':80,'ai':92,'result':100};
+var dotMap = {'1':1,'2a':2,'q1':2,'q1b':2,'q2':3,'q3':3,'refs':4,'refs2':4,'ai':5,'result':5};
 
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
@@ -1160,6 +1293,26 @@ function selectOption(el){
   var grid = el.closest('.option-grid');
   grid.querySelectorAll('.option-card').forEach(function(o){ o.classList.remove('selected'); });
   el.classList.add('selected');
+}
+
+// Plateformes — sélection multiple
+function togglePlatform(el){
+  el.classList.toggle('selected');
+}
+
+// Inserer une cible dans le textarea Q2
+function insertTarget(val){
+  var ta = document.getElementById('q2-text');
+  ta.value = val;
+  ta.focus();
+  // Passer en mode texte si on était en voix
+  var textTab = document.querySelector('.input-tab');
+  if(textTab) {
+    document.querySelectorAll('.input-tab').forEach(function(t){ t.classList.remove('active'); });
+    textTab.classList.add('active');
+    document.getElementById('q2-text-input').style.display = 'block';
+    document.getElementById('q2-voice-input').style.display = 'none';
+  }
 }
 
 function switchTab(tab, mode, qid){
