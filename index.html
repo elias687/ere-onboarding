@@ -617,6 +617,34 @@ h2{
 ::-webkit-scrollbar{width:3px;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);border-radius:99px;}
+
+/* ══ DEADLINE PILLS ══ */
+.deadline-pill{
+  padding:12px 8px;
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:var(--r);
+  font-size:13px;
+  font-weight:600;
+  color:var(--text);
+  text-align:center;
+  cursor:pointer;
+  transition:all var(--transition);
+  user-select:none;
+  font-family:'Bricolage Grotesque',sans-serif;
+}
+.deadline-pill:hover{border-color:var(--text);transform:translateY(-1px);}
+.deadline-pill.selected{
+  background:var(--text);
+  color:var(--bg);
+  border-color:var(--text);
+}
+input[type="date"]::-webkit-calendar-picker-indicator{
+  cursor:pointer;
+  opacity:0.5;
+  filter:invert(0.3);
+}
+input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1;}
 </style>
 </head>
 <body>
@@ -992,13 +1020,7 @@ h2{
   <h2 class="question-text">Qui est votre<br>audience cible ?</h2>
   <p class="question-hint">Secteur, age, poste, habitudes. Soyez precis.</p>
 
-  <div class="input-tabs">
-    <div class="input-tab active" onclick="switchTab(this,'text','q2')">✍️ Texte</div>
-    <div class="input-tab" onclick="switchTab(this,'voice','q2')">🎙️ Voix</div>
-  </div>
-
-  <div id="q2-text-input">
-    <textarea class="answer-textarea" id="q2-text" placeholder="Ex : DAF d'une ETI parisienne, DSI grand compte, DG d'une agence..." rows="4"></textarea>
+  <textarea class="answer-textarea" id="q2-text" placeholder="Ex : DAF d'une ETI parisienne, DSI grand compte, DG d'une agence..." rows="4"></textarea>
 
   <!-- SUGGESTIONS CIBLES -->
   <div style="margin-top:10px;">
@@ -1016,24 +1038,8 @@ h2{
       <div class="ref-example-pill" onclick="insertTarget('DSI / CTO, scale-ups et grands groupes, secteur finance et assurance')">DSI / CTO</div>
     </div>
   </div>
-  </div>
-  <div id="q2-voice-input" style="display:none;">
-    <div class="voice-zone">
-      <div class="waveform" id="q2-waveform">
-        <div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div>
-      </div>
-      <div class="voice-timer" id="q2-timer">0:00</div>
-      <div class="record-btn" id="q2-record-btn" onclick="toggleRecording('q2')">🎙️</div>
-      <div class="voice-label" id="q2-voice-label">Appuyez pour enregistrer</div>
-    </div>
-    <div id="q2-transcription" style="display:none;margin-top:14px;">
-      <div class="transcription-label">Transcription IA</div>
-      <textarea class="answer-textarea" id="q2-transcribed" rows="4"></textarea>
-    </div>
-  </div>
-
   <div class="form-nav">
-    <button class="btn-back" onclick="goToStep('q1')" title="Retour">← Retour</button>
+    <button class="btn-back" onclick="goToStep('q1b')" title="Retour">← Retour</button>
     <button class="btn btn-primary" onclick="goToStep('q3')" style="flex:1;">Suivant →</button>
   </div>
 </div>
@@ -1047,23 +1053,97 @@ h2{
   <h2 class="question-text">Message & format</h2>
   <p class="question-hint">Les elements techniques qui cadrent la production.</p>
 
-  <div style="display:flex;flex-direction:column;gap:16px;">
+  <div style="display:flex;flex-direction:column;gap:20px;">
+
+    <!-- MESSAGE CLE avec voix -->
     <div>
-      <div class="ref-input-label" style="margin-bottom:8px;">Message cle</div>
-      <textarea class="answer-textarea" style="min-height:80px;" placeholder="La phrase que le client doit retenir apres avoir vu la video..."></textarea>
-    </div>
-    <div>
-      <div class="ref-input-label" style="margin-bottom:8px;">Format et duree</div>
-      <div class="option-grid" style="grid-template-columns:repeat(3,1fr);">
-        <div class="option-card" style="flex-direction:column;align-items:flex-start;gap:4px;" onclick="selectOption(this)"><span>⚡</span><span style="font-size:12px;font-weight:600;">15-30s</span><span class="option-check">✓</span></div>
-        <div class="option-card" style="flex-direction:column;align-items:flex-start;gap:4px;" onclick="selectOption(this)"><span>🎬</span><span style="font-size:12px;font-weight:600;">60-90s</span><span class="option-check">✓</span></div>
-        <div class="option-card" style="flex-direction:column;align-items:flex-start;gap:4px;" onclick="selectOption(this)"><span>🎞️</span><span style="font-size:12px;font-weight:600;">2-3 min</span><span class="option-check">✓</span></div>
+      <div class="ref-input-label" style="margin-bottom:10px;">
+        Message cle
+        <span style="font-size:10px;color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0;">La phrase que le spectateur doit retenir</span>
+      </div>
+      <div class="input-tabs" style="margin-bottom:10px;">
+        <div class="input-tab active" onclick="switchTab(this,'text','q3msg')">✍️ Texte</div>
+        <div class="input-tab" onclick="switchTab(this,'voice','q3msg')">🎙️ Dicter</div>
+      </div>
+      <div id="q3msg-text-input">
+        <textarea class="answer-textarea" id="q3msg-text" style="min-height:80px;" placeholder="Ex : Notre outil reduit les couts operationnels de 40% sans friction pour les equipes..."></textarea>
+      </div>
+      <div id="q3msg-voice-input" style="display:none;">
+        <div class="voice-zone">
+          <div class="waveform" id="q3msg-waveform">
+            <div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div>
+          </div>
+          <div class="voice-timer" id="q3msg-timer">0:00</div>
+          <div class="record-btn" id="q3msg-record-btn" onclick="toggleRecording('q3msg')">🎙️</div>
+          <div class="voice-label" id="q3msg-voice-label">Appuyez pour enregistrer votre message</div>
+        </div>
+        <div id="q3msg-transcription" style="display:none;margin-top:12px;">
+          <div class="transcription-label">Transcription IA</div>
+          <textarea class="answer-textarea" id="q3msg-transcribed" rows="3"></textarea>
+        </div>
       </div>
     </div>
-    <div>
-      <div class="ref-input-label" style="margin-bottom:8px;">Deadline souhaitee</div>
-      <textarea class="answer-textarea" style="min-height:60px;" placeholder="Ex : dans 3 semaines, avant le 15 mai, sans contrainte..."></textarea>
+
+    <!-- BRIEF EXISTANT -->
+    <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:18px 20px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+        <span style="font-size:18px;">📎</span>
+        <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:14px;font-weight:800;">Vous avez deja un brief ?</div>
+      </div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:12px;">Collez un lien (Google Drive, Notion, Figma...) ou decrivez-le brievement.</div>
+      <input id="q3-brief-existant" type="url" placeholder="https://drive.google.com/... ou notion.so/..." style="width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;padding:12px 14px;outline:none;transition:border-color 0.2s;" onfocus="this.style.borderColor='var(--text)'" onblur="this.style.borderColor='var(--border)'">
     </div>
+
+    <!-- FORMAT -->
+    <div>
+      <div class="ref-input-label" style="margin-bottom:10px;">Format & duree</div>
+      <div class="option-grid" style="grid-template-columns:repeat(3,1fr);">
+        <div class="option-card" style="flex-direction:column;align-items:center;text-align:center;gap:4px;padding:14px 8px;" onclick="selectOption(this)">
+          <span style="font-size:20px;">⚡</span>
+          <span style="font-size:13px;font-weight:700;">15 – 30s</span>
+          <span style="font-size:10px;color:var(--muted);">Social / Ads</span>
+          <span class="option-check" style="position:static;margin:0;">✓</span>
+        </div>
+        <div class="option-card" style="flex-direction:column;align-items:center;text-align:center;gap:4px;padding:14px 8px;" onclick="selectOption(this)">
+          <span style="font-size:20px;">🎬</span>
+          <span style="font-size:13px;font-weight:700;">60 – 90s</span>
+          <span style="font-size:10px;color:var(--muted);">Brand / Explainer</span>
+          <span class="option-check" style="position:static;margin:0;">✓</span>
+        </div>
+        <div class="option-card" style="flex-direction:column;align-items:center;text-align:center;gap:4px;padding:14px 8px;" onclick="selectOption(this)">
+          <span style="font-size:20px;">🎞️</span>
+          <span style="font-size:13px;font-weight:700;">2 – 3 min</span>
+          <span style="font-size:10px;color:var(--muted);">Institutional / Full</span>
+          <span class="option-check" style="position:static;margin:0;">✓</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- DEADLINE — pills rapides + date picker -->
+    <div>
+      <div class="ref-input-label" style="margin-bottom:10px;">
+        Deadline
+        <span id="deadline-display" style="font-size:12px;color:var(--text);font-weight:600;text-transform:none;letter-spacing:0;background:var(--accent);padding:2px 10px;border-radius:99px;display:none;"></span>
+      </div>
+      <!-- Pills rapides -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px;">
+        <div class="deadline-pill" onclick="selectDeadline(this,'4 jours')">4 jours</div>
+        <div class="deadline-pill" onclick="selectDeadline(this,'1 semaine')">1 semaine</div>
+        <div class="deadline-pill" onclick="selectDeadline(this,'2 semaines')">2 semaines</div>
+        <div class="deadline-pill" onclick="selectDeadline(this,'1 mois')">1 mois</div>
+      </div>
+      <!-- Date precise -->
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div style="height:1px;flex:1;background:var(--border);"></div>
+        <span style="font-size:11px;color:var(--muted);white-space:nowrap;">ou choisir une date</span>
+        <div style="height:1px;flex:1;background:var(--border);"></div>
+      </div>
+      <div style="margin-top:10px;position:relative;">
+        <input type="date" id="deadline-date" min="" style="width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;padding:13px 16px;outline:none;cursor:pointer;transition:border-color 0.2s;-webkit-appearance:none;appearance:none;" onfocus="this.style.borderColor='var(--text)'" onblur="this.style.borderColor='var(--border)'" onchange="selectDeadlinePrecise(this.value)">
+      </div>
+      <input type="hidden" id="deadline-value" value="">
+    </div>
+
   </div>
 
   <div class="form-nav">
@@ -1375,6 +1455,39 @@ function togglePlatform(el){
   el.classList.toggle('selected');
 }
 
+// Deadline — pills rapides
+function selectDeadline(el, val){
+  document.querySelectorAll('.deadline-pill').forEach(function(p){ p.classList.remove('selected'); });
+  el.classList.add('selected');
+  document.getElementById('deadline-value').value = val;
+  document.getElementById('deadline-date').value = '';
+  var disp = document.getElementById('deadline-display');
+  disp.textContent = val;
+  disp.style.display = 'inline-block';
+}
+
+// Deadline — date precise
+function selectDeadlinePrecise(val){
+  if(!val) return;
+  document.querySelectorAll('.deadline-pill').forEach(function(p){ p.classList.remove('selected'); });
+  var date = new Date(val);
+  var options = {day:'numeric', month:'long', year:'numeric'};
+  var formatted = date.toLocaleDateString('fr-FR', options);
+  document.getElementById('deadline-value').value = formatted;
+  var disp = document.getElementById('deadline-display');
+  disp.textContent = formatted;
+  disp.style.display = 'inline-block';
+}
+
+// Init date min = aujourd'hui
+window.addEventListener('DOMContentLoaded', function(){
+  var picker = document.getElementById('deadline-date');
+  if(picker){
+    var today = new Date().toISOString().split('T')[0];
+    picker.min = today;
+  }
+});
+
 // Contact — moyen de communication
 var selectedContact = '';
 function selectContact(mode){
@@ -1605,12 +1718,14 @@ function collectFormData(){
   var q2 = (q2transcribed && q2transcribed.value.trim()) ? q2transcribed.value.trim() : (q2text ? q2text.value.trim() : '');
   if(!q2) q2 = 'Non precise';
 
-  // Q3 - message cle
-  var q3fields = document.querySelectorAll('#screen-q3 .answer-textarea');
-  var messageCle = q3fields[0] ? q3fields[0].value.trim() : '';
-  var deadline = q3fields[1] ? q3fields[1].value.trim() : '';
+  // Q3 - message cle (texte ou voix)
+  var q3msgText = (document.getElementById('q3msg-text') || {}).value || '';
+  var q3msgVoice = (document.getElementById('q3msg-transcribed') || {}).value || '';
+  var messageCle = q3msgVoice.trim() || q3msgText.trim() || 'Non precise';
+  var deadline = (document.getElementById('deadline-value') || {}).value || 'Non precise';
+  var briefExistant = (document.getElementById('q3-brief-existant') || {}).value || '';
   var formatEl = document.querySelector('#screen-q3 .option-card.selected');
-  var format = formatEl ? formatEl.textContent.trim() : 'Non precise';
+  var format = formatEl ? (formatEl.querySelector('span:nth-child(2)') ? formatEl.querySelector('span:nth-child(2)').textContent.trim() : formatEl.textContent.trim()) : 'Non precise';
 
   // Refs
   var contextsEl = document.querySelectorAll('#ref-context .ref-context-card.selected .ref-context-label');
@@ -1631,6 +1746,7 @@ function collectFormData(){
     messageCle: messageCle || 'Non precise',
     format: format,
     deadline: deadline || 'Non precise',
+    briefExistant: briefExistant || 'Aucun',
     references: refs.join(', ') || 'Non precise',
     aspectsInspiration: contexts || 'Non precise',
     aEviter: avoid || 'Rien de specifique'
