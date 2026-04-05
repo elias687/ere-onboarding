@@ -9,10 +9,11 @@ export default async function handler(req, res) {
   try {
     const data = req.body;
 
+    // 1. GENERER LE BRIEF AVEC CLAUDE
     const prompt = [
-      'Tu es un expert en production video et motion design.',
+      'Tu es un expert en production video et motion design pour ERE Agency.',
       'Genere un brief professionnel en francais a partir de ces infos client.',
-      'Reponds UNIQUEMENT en JSON avec : objectif, audience, messageCle, directionCreative, references, aEviter, livrable, score (60-99).',
+      'Reponds UNIQUEMENT en JSON avec : objectif, audience, messageCle, directionCreative, references, aEviter, livrable, score (60-99), nomClient, typeService.',
       'OBJECTIF: ' + data.objectif,
       'AUDIENCE: ' + data.audience,
       'MESSAGE CLE: ' + data.messageCle,
@@ -22,10 +23,13 @@ export default async function handler(req, res) {
       'ASPECTS: ' + data.aspectsInspiration,
       'A EVITER: ' + data.aEviter,
       'directionCreative = synthese creative 2-3 phrases basee sur les references.',
-      'livrable = format + deadline. JSON uniquement sans markdown.'
+      'livrable = format + deadline.',
+      'nomClient = deduis un nom generique si non fourni.',
+      'typeService = deduis depuis objectif (motion design / FOOH / explainer / brand video).',
+      'JSON uniquement sans markdown.'
     ].join(' ');
 
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const claudeResponse = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -39,12 +43,47 @@ export default async function handler(req, res) {
       })
     });
 
-    const result = await response.json();
-    if (!response.ok) return res.status(response.status).json({ error: result.error?.message || 'Claude error' });
+    const claudeResult = await claudeResponse.json();
+    if (!claudeResponse.ok) return res.status(claudeResponse.status).json({ error: claudeResult.error?.message || 'Claude error' });
 
-    let text = result.content[0].text.trim();
+    let text = claudeResult.content[0].text.trim();
     text = text.replace(/```json/g, '').replace(/```/g, '').trim();
     const brief = JSON.parse(text);
+
+    // 2. ENVOYER A MAKE.COM (PROFILE&SLIDES webhook)
+    const makeWebhookUrl = process.env.MAKE_WEBHOOK_URL;
+    if (makeWebhookUrl) {
+      const makePayload = {
+        // Infos pour PROFILE&SLIDES
+        deadline: brief.livrable || data.deadline,
+        nomClient: brief.nomClient || 'Client ERE',
+        typeService: brief.typeService || data.objectif,
+        format: data.format,
+
+        // Brief complet
+        objectif: brief.objectif,
+        audience: brief.audience,
+        messageCle: brief.messageCle,
+        directionCreative: brief.directionCreative,
+        references: brief.references || data.references,
+        aEviter: brief.aEviter,
+        livrable: brief.livrable,
+        score: brief.score,
+
+        // Metadata
+        sourceFormulaire: 'ere-onboarding.vercel.app',
+        dateCommande: new Date().toISOString()
+      };
+
+      // Envoi non bloquant (on ne fait pas attendre le client)
+      fetch(makeWebhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(makePayload)
+      }).catch(err => console.error('Make webhook error:', err));
+    }
+
+    // 3. RETOURNER LE BRIEF AU CLIENT
     return res.status(200).json(brief);
 
   } catch (err) {
