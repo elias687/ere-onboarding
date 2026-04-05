@@ -719,15 +719,60 @@ function toggleRecording(qid){
   var label = document.getElementById(qid+'-voice-label');
   var timer = document.getElementById(qid+'-timer');
   var waveform = document.getElementById(qid+'-waveform');
-  if(!recordings[qid]){
+
+  // ── DEJA EN COURS : STOP ──
+  if(recordings[qid]){
+    recordings[qid] = false;
+    clearInterval(timers[qid]);
+    timer.style.display = 'none';
+    waveform.style.display = 'none';
+    btn.classList.remove('recording');
+    btn.textContent = 'MIC';
+    btn.style.fontSize = '26px';
+    btn.style.fontWeight = '';
+
+    // Stopper la reconnaissance si active
+    if(speechRecognitions[qid]){
+      try { speechRecognitions[qid].stop(); } catch(e){}
+    }
+    return;
+  }
+
+  // ── DEMARRER ──
+  var SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+
+  // Verifier support navigateur
+  if(!SpeechRec){
+    label.textContent = 'Votre navigateur ne supporte pas la voix. Utilisez Chrome ou Safari.';
+    label.style.color = 'var(--danger)';
+    return;
+  }
+
+  // Demander acces micro
+  navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
+    stream.getTracks().forEach(function(t){ t.stop(); }); // juste pour la permission
+
+    // ── LANCER Speech Recognition ──
+    var recognition = new SpeechRec();
+    recognition.lang = 'fr-FR';
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    speechRecognitions[qid] = recognition;
+
+    var fullTranscript = '';
+    var interimText = '';
+
     recordings[qid] = true;
     btn.classList.add('recording');
     btn.textContent = 'STOP';
     btn.style.fontSize = '11px';
     btn.style.fontWeight = '700';
-    label.textContent = 'Enregistrement en cours';
+    label.textContent = 'Parlez maintenant...';
+    label.style.color = '';
     timer.style.display = 'block';
     waveform.style.display = 'flex';
+
+    // Timer
     var secs = 0;
     timers[qid] = setInterval(function(){
       secs++;
@@ -735,23 +780,54 @@ function toggleRecording(qid){
       var s = secs%60;
       timer.textContent = m+':'+(s<10?'0':'')+s;
     },1000);
-  } else {
-    recordings[qid] = false;
-    clearInterval(timers[qid]);
-    btn.classList.remove('recording');
-    btn.textContent = 'MIC';
-    btn.style.fontSize = '11px';
-    label.textContent = 'Transcription en cours...';
-    timer.style.display = 'none';
-    waveform.style.display = 'none';
-    setTimeout(function(){
-      label.textContent = 'Transcription terminee';
-      var ta = document.getElementById(qid+'-transcription');
-      var tx = document.getElementById(qid+'-transcribed');
-      ta.style.display = 'block';
-      tx.value = "Directeurs marketing de PME tech entre 10 et 50 salaries, actifs sur LinkedIn, entre 30 et 45 ans. Ils cherchent une communication professionnelle mais agile.";
-    },1800);
-  }
+
+    // Afficher textarea en temps reel
+    var ta = document.getElementById(qid+'-transcription');
+    var tx = document.getElementById(qid+'-transcribed');
+    ta.style.display = 'block';
+
+    recognition.onresult = function(event){
+      interimText = '';
+      for(var i = event.resultIndex; i < event.results.length; i++){
+        if(event.results[i].isFinal){
+          fullTranscript += event.results[i][0].transcript + ' ';
+        } else {
+          interimText += event.results[i][0].transcript;
+        }
+      }
+      tx.value = fullTranscript + interimText;
+      label.textContent = 'Transcription en direct...';
+    };
+
+    recognition.onerror = function(event){
+      if(event.error === 'no-speech') return;
+      label.textContent = 'Erreur micro : ' + event.error;
+      label.style.color = 'var(--danger)';
+      clearInterval(timers[qid]);
+      recordings[qid] = false;
+      btn.classList.remove('recording');
+      btn.textContent = 'MIC';
+      btn.style.fontSize = '26px';
+      timer.style.display = 'none';
+      waveform.style.display = 'none';
+    };
+
+    recognition.onend = function(){
+      // Relancer automatiquement si toujours en mode recording (continuous workaround)
+      if(recordings[qid]){
+        try { recognition.start(); } catch(e){}
+      } else {
+        label.textContent = 'Transcription terminee ✓';
+        label.style.color = 'var(--accent)';
+      }
+    };
+
+    recognition.start();
+
+  }).catch(function(){
+    label.textContent = 'Acces au microphone refuse. Autorisez-le dans votre navigateur.';
+    label.style.color = 'var(--danger)';
+  });
 }
 
 function selectContext(el){
