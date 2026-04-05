@@ -129,34 +129,35 @@ main{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:5
 /* ══ HEADINGS ══ */
 h1{
   font-family:'Syne',sans-serif;
-  font-size:clamp(32px,6vw,52px);
+  font-size:clamp(30px,5.5vw,48px);
   font-weight:800;
-  line-height:1.04;
+  line-height:1.12;
   margin-bottom:16px;
-  letter-spacing:-0.03em;
+  letter-spacing:-0.015em;
   color:var(--text);
 }
 h1 em{
   font-style:normal;
   background:var(--accent);
   color:var(--text);
-  padding:0 10px 2px;
-  border-radius:8px;
-  display:inline-block;
+  padding:2px 10px 4px;
+  border-radius:10px;
+  display:inline;
+  line-height:1.3;
 }
 h2{
   font-family:'Syne',sans-serif;
   font-size:clamp(22px,4vw,30px);
   font-weight:800;
-  line-height:1.15;
+  line-height:1.22;
   margin-bottom:10px;
-  letter-spacing:-0.02em;
+  letter-spacing:-0.01em;
   color:var(--text);
 }
 .sub{
   color:var(--muted);
-  font-size:15px;
-  line-height:1.7;
+  font-size:16px;
+  line-height:1.75;
   margin-bottom:36px;
   font-weight:400;
   max-width:520px;
@@ -197,7 +198,7 @@ h2{
   background:var(--surface);
 }
 .choice-icon{font-size:28px;line-height:1;}
-.choice-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;line-height:1.2;color:var(--text);}
+.choice-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;line-height:1.3;letter-spacing:-0.005em;color:var(--text);}
 .choice-desc{font-size:12px;color:var(--muted);line-height:1.6;font-weight:400;}
 .choice-badge{
   display:inline-flex;align-items:center;gap:4px;
@@ -305,8 +306,10 @@ h2{
 .question-text{
   font-family:'Syne',sans-serif;
   font-size:clamp(22px,3.5vw,30px);
-  font-weight:800;line-height:1.2;
-  margin-bottom:8px;letter-spacing:-0.02em;
+  font-weight:800;
+  line-height:1.25;
+  margin-bottom:8px;
+  letter-spacing:-0.01em;
   color:var(--text);
 }
 .question-hint{color:var(--muted);font-size:14px;margin-bottom:28px;font-weight:400;line-height:1.65;}
@@ -861,96 +864,156 @@ h2{
   </div>
 </div>
 
-<!-- ══ SCREEN REFS : REFERENCES (OBLIGATOIRE) ══ -->
+<!-- ══ SCREEN REFS-1 : POURQUOI (sensibilisation) ══ -->
 <div class="screen" id="screen-refs">
-  <div class="tag tag-warn"><span class="tag-dot"></span> Etape obligatoire</div>
+  <div class="tag tag-warn"><span class="tag-dot"></span> Etape cle</div>
 
   <h1>Vos <em>references</em><br>visuelles</h1>
-  <p class="sub">La page la plus importante du formulaire. Sans elle, on travaille a l'aveugle.</p>
+  <p class="sub">La page la plus importante du formulaire. Lisez ceci avant de continuer.</p>
 
-  <!-- BANNIERE CRITIQUE -->
-  <div class="ref-mandatory-banner">
-    <div class="ref-mandatory-title">
-      Pourquoi c'est critique
-      <span class="badge-critical">Obligatoire</span>
+  <!-- STAT CENTRALE — impact visuel immédiat -->
+  <div style="text-align:center;padding:40px 0 36px;">
+    <div style="font-family:'Syne',sans-serif;font-size:clamp(64px,14vw,96px);font-weight:800;line-height:1;color:var(--text);letter-spacing:-0.04em;">80%</div>
+    <div style="font-size:15px;color:var(--muted);margin-top:10px;font-weight:400;">des clients avec de bonnes references<br>valident leur video <strong style="color:var(--text);">au premier jet.</strong></div>
+  </div>
+
+  <!-- TROIS ARGUMENTS — épurés, un par ligne -->
+  <div style="display:flex;flex-direction:column;gap:1px;border:1.5px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:32px;">
+    <div style="display:flex;align-items:center;gap:16px;padding:18px 20px;background:var(--surface);">
+      <span style="font-size:22px;flex-shrink:0;">🎯</span>
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:var(--text);margin-bottom:2px;">Direction precise</div>
+        <div style="font-size:13px;color:var(--muted);">L'equipe sait exactement ou aller des le premier rendu</div>
+      </div>
     </div>
-    <div class="ref-mandatory-body">
-      Le motion design est un art <strong>subjectif</strong>. Deux clients qui disent "moderne et premium" peuvent vouloir deux univers completement opposes.<br><br>
-      Les references sont le seul langage universel entre vous et notre equipe de production. <strong>Sans elles : risque de hors-sujet, allers-retours, delais.</strong><br><br>
-      Les clients qui fournissent des references solides <strong>valident leur video a 80% au premier jet.</strong>
+    <div style="display:flex;align-items:center;gap:16px;padding:18px 20px;background:var(--surface);border-top:1px solid var(--border);">
+      <span style="font-size:22px;flex-shrink:0;">⚡</span>
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:var(--text);margin-bottom:2px;">2x moins d'allers-retours</div>
+        <div style="font-size:13px;color:var(--muted);">Livraison acceleree, moins de stress pour tout le monde</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px;padding:18px 20px;background:var(--surface);border-top:1px solid var(--border);">
+      <span style="font-size:22px;flex-shrink:0;">🚫</span>
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:var(--text);margin-bottom:2px;">Sans references</div>
+        <div style="font-size:13px;color:var(--muted);">Risque de hors-sujet, de delais et de frustration</div>
+      </div>
     </div>
   </div>
 
-  <!-- POURQUOI CA CHANGE TOUT -->
-  <div class="ref-why-grid">
-    <div class="ref-why-card">
-      <div class="ref-why-icon">🎯</div>
-      <div class="ref-why-title">Direction precise</div>
-      <div class="ref-why-desc">L'equipe sait exactement ou aller des le premier rendu</div>
-    </div>
-    <div class="ref-why-card">
-      <div class="ref-why-icon">⚡</div>
-      <div class="ref-why-title">2x plus vite</div>
-      <div class="ref-why-desc">Moins d'allers-retours = livraison acceleree</div>
-    </div>
-    <div class="ref-why-card">
-      <div class="ref-why-icon">✅</div>
-      <div class="ref-why-title">Valide du 1er coup</div>
-      <div class="ref-why-desc">80% de validation au premier jet avec de bonnes refs</div>
-    </div>
+  <div class="form-nav">
+    <button class="btn-back" onclick="goToStep('q3')" title="Retour">← Retour</button>
+    <button class="btn btn-primary" onclick="goToStep('refs2')" style="flex:1;">Ajouter mes references →</button>
+  </div>
+</div>
+
+<!-- ══ SCREEN REFS-2 : SAISIE ══ -->
+<div class="screen" id="screen-refs2">
+  <div class="question-meta">
+    <span class="question-num">References</span>
+    <span class="question-count">5 / 5</span>
   </div>
 
-  <div class="sep" style="margin:18px 0;"></div>
+  <h2 class="question-text">Quelles videos<br>vous inspirent ?</h2>
+  <p class="question-hint">Liens YouTube, noms de marques, campagnes — tout ce qui represente l'univers que vous visez.</p>
 
-  <!-- QUEL ASPECT VOUS INSPIRE -->
-  <div class="ref-input-label" style="margin-bottom:10px;">Quel aspect vous inspire dans ces references ?</div>
+  <!-- ASPECT -->
+  <div class="ref-input-label" style="margin-bottom:10px;">Ce qui vous inspire dans ces references</div>
   <div class="ref-context-grid" id="ref-context">
     <div class="ref-context-card" onclick="selectContext(this)"><div class="ref-context-icon">🎨</div><div class="ref-context-label">Style visuel</div></div>
-    <div class="ref-context-card" onclick="selectContext(this)"><div class="ref-context-icon">⚡</div><div class="ref-context-label">Rythme / Energie</div></div>
-    <div class="ref-context-card" onclick="selectContext(this)"><div class="ref-context-icon">🎵</div><div class="ref-context-label">Ambiance sonore</div></div>
-    <div class="ref-context-card" onclick="selectContext(this)"><div class="ref-context-icon">✍️</div><div class="ref-context-label">Typographie</div></div>
-    <div class="ref-context-card" onclick="selectContext(this)"><div class="ref-context-icon">🌈</div><div class="ref-context-label">Palette couleurs</div></div>
-    <div class="ref-context-card" onclick="selectContext(this)"><div class="ref-context-icon">📐</div><div class="ref-context-label">Structure / Layout</div></div>
+    <div class="ref-context-card" onclick="selectContext(this)"><div class="ref-context-icon">⚡</div><div class="ref-context-label">Rythme</div></div>
+    <div class="ref-context-card" onclick="selectContext(this)"><div class="ref-context-icon">🎵</div><div class="ref-context-label">Ambiance</div></div>
+    <div class="ref-context-card" onclick="selectContext(this)"><div class="ref-context-icon">✍️</div><div class="ref-context-label">Typo</div></div>
+    <div class="ref-context-card" onclick="selectContext(this)"><div class="ref-context-icon">🌈</div><div class="ref-context-label">Couleurs</div></div>
+    <div class="ref-context-card" onclick="selectContext(this)"><div class="ref-context-icon">📐</div><div class="ref-context-label">Structure</div></div>
   </div>
 
-  <div class="sep" style="margin:18px 0;"></div>
+  <div class="sep"></div>
 
-  <!-- REFS INPUT -->
+  <!-- INSPIRATION SOURCES -->
+  <div class="ref-input-label" style="margin-bottom:12px;">
+    Trouvez vos references
+  </div>
+
+  <!-- 4 boutons plateformes -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px;">
+
+    <a href="https://fr.pinterest.com/search/pins/?q=motion+graphics+loop&rs=typed" target="_blank" rel="noopener"
+       style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);text-decoration:none;color:var(--text);transition:all 0.2s;cursor:pointer;"
+       onmouseover="this.style.borderColor='var(--text)';this.style.transform='translateY(-1px)'"
+       onmouseout="this.style.borderColor='var(--border)';this.style.transform='translateY(0)'">
+      <span style="font-size:22px;flex-shrink:0;">📌</span>
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:800;line-height:1.2;">Pinterest</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;">Motion graphics</div>
+      </div>
+      <span style="margin-left:auto;color:var(--muted);font-size:12px;">↗</span>
+    </a>
+
+    <a href="https://www.behance.net/search/projects?field=motion+graphics" target="_blank" rel="noopener"
+       style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);text-decoration:none;color:var(--text);transition:all 0.2s;cursor:pointer;"
+       onmouseover="this.style.borderColor='var(--text)';this.style.transform='translateY(-1px)'"
+       onmouseout="this.style.borderColor='var(--border)';this.style.transform='translateY(0)'">
+      <span style="font-size:22px;flex-shrink:0;">🎨</span>
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:800;line-height:1.2;">Behance</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;">Projets motion</div>
+      </div>
+      <span style="margin-left:auto;color:var(--muted);font-size:12px;">↗</span>
+    </a>
+
+    <a href="https://www.youtube.com/results?search_query=motion+design+showreel+2024" target="_blank" rel="noopener"
+       style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);text-decoration:none;color:var(--text);transition:all 0.2s;cursor:pointer;"
+       onmouseover="this.style.borderColor='var(--text)';this.style.transform='translateY(-1px)'"
+       onmouseout="this.style.borderColor='var(--border)';this.style.transform='translateY(0)'">
+      <span style="font-size:22px;flex-shrink:0;">▶️</span>
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:800;line-height:1.2;">YouTube</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;">Showreels motion</div>
+      </div>
+      <span style="margin-left:auto;color:var(--muted);font-size:12px;">↗</span>
+    </a>
+
+    <a href="https://dribbble.com/search/motion" target="_blank" rel="noopener"
+       style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);text-decoration:none;color:var(--text);transition:all 0.2s;cursor:pointer;"
+       onmouseover="this.style.borderColor='var(--text)';this.style.transform='translateY(-1px)'"
+       onmouseout="this.style.borderColor='var(--border)';this.style.transform='translateY(0)'">
+      <span style="font-size:22px;flex-shrink:0;">🏀</span>
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:800;line-height:1.2;">Dribbble</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;">Animations UI</div>
+      </div>
+      <span style="margin-left:auto;color:var(--muted);font-size:12px;">↗</span>
+    </a>
+
+  </div>
+
+  <!-- CHAMP DE SAISIE -->
   <div class="ref-input-label">
-    References visuelles (videos, marques, campagnes)
+    Collez vos liens ou noms ici
     <span class="ref-counter" id="refs-counter">0 / min. 2</span>
   </div>
   <div class="ref-chips-input" id="refs-chips-zone" onclick="document.getElementById('refs-chip-input').focus()">
     <div id="refs-chips-list" style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;"></div>
-    <input class="ref-chip-input-field" id="refs-chip-input" placeholder="Coller un lien ou taper un nom..." onkeydown="handleRefInput(event)">
+    <input class="ref-chip-input-field" id="refs-chip-input" placeholder="ex : https://pin.it/xxx ou Apple WWDC 2023..." onkeydown="handleRefInput(event)">
   </div>
-  <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Appuyez sur Entree pour valider chaque reference</div>
+  <div style="font-size:11px;color:var(--muted);margin-bottom:14px;">Touche Entree pour valider chaque reference</div>
 
-  <div style="font-size:11px;color:var(--muted);margin-bottom:8px;font-weight:500;">Exemples rapides :</div>
-  <div class="ref-examples">
-    <div class="ref-example-pill" onclick="addRefExample('Apple — Shot on iPhone')">Apple</div>
-    <div class="ref-example-pill" onclick="addRefExample('Linear App')">Linear</div>
-    <div class="ref-example-pill" onclick="addRefExample('Stripe — Brand video')">Stripe</div>
-    <div class="ref-example-pill" onclick="addRefExample('Notion Explainer')">Notion</div>
-    <div class="ref-example-pill" onclick="addRefExample('Airbnb Campaign')">Airbnb</div>
-    <div class="ref-example-pill" onclick="addRefExample('Nike — Short film')">Nike</div>
-    <div class="ref-example-pill" onclick="addRefExample('Figma — Launch video')">Figma</div>
-  </div>
-
-  <div class="sep" style="margin:20px 0;"></div>
+  <div class="sep"></div>
 
   <!-- CE QU'ON EVITE -->
-  <div class="ref-input-label" style="margin-bottom:8px;">Ce que vous voulez absolument eviter</div>
-  <textarea class="answer-textarea" id="ref-avoid" style="min-height:80px;" placeholder="Styles, couleurs, approches a proscrire... (ex : pas de stock footage, pas de 3D realiste, eviter le bleu corporate)"></textarea>
+  <div class="ref-input-label" style="margin-bottom:8px;">Ce que vous voulez eviter</div>
+  <textarea class="answer-textarea" id="ref-avoid" style="min-height:72px;" placeholder="Ex : pas de stock footage, pas de 3D realiste, eviter le bleu corporate..."></textarea>
 
-  <!-- ETAT VALIDATION -->
+  <!-- VALIDATION STATE -->
   <div class="ref-validation" id="ref-validation">
     <div class="ref-val-icon">⏳</div>
     <div class="ref-val-text">Ajoutez au moins <strong>2 references</strong> et selectionnez <strong>1 aspect</strong> pour continuer.</div>
   </div>
 
   <div class="form-nav">
-    <button class="btn-back" onclick="goToStep('q3')" title="Retour">← Retour</button>
+    <button class="btn-back" onclick="goToStep('refs')" title="Retour">← Retour</button>
     <button class="btn btn-primary" id="btn-refs-next" onclick="startAI()" style="flex:1;" disabled>Generer le brief ✦</button>
   </div>
 </div>
@@ -1040,8 +1103,8 @@ var refs = [];
 var selectedContexts = 0;
 var formAnswers = {};
 
-var progressMap = {'1':8,'2a':22,'q1':36,'q2':50,'q3':64,'refs':78,'ai':90,'result':100};
-var dotMap = {'1':1,'2a':2,'q1':2,'q2':3,'q3':3,'refs':4,'ai':5,'result':5};
+var progressMap = {'1':8,'2a':22,'q1':36,'q2':50,'q3':60,'refs':70,'refs2':82,'ai':92,'result':100};
+var dotMap = {'1':1,'2a':2,'q1':2,'q2':3,'q3':3,'refs':4,'refs2':4,'ai':5,'result':5};
 
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
