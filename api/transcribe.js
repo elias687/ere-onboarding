@@ -11,26 +11,33 @@ export default async function handler(req, res) {
   try {
     const chunks = [];
     for await (const chunk of req) chunks.push(chunk);
-    const buffer = Buffer.concat(chunks);
+    const audioBuffer = Buffer.concat(chunks);
 
-    // Forward to OpenAI Whisper
-    const { Readable } = await import('stream');
-    const FormData = (await import('formdata-node')).FormData;
-    const { fileFromPath } = await import('formdata-node/file-from-path');
+    const boundary = 'WhistperBoundary' + Date.now();
+    const CRLF = '\r\n';
 
-    // Use fetch with raw buffer
-    const boundary = '----FormBoundary' + Math.random().toString(36);
-    const body = Buffer.concat([
-      Buffer.from(`--${boundary}\r\nContent-Disposition: form-data; name="file"; filename="audio.webm"\r\nContent-Type: audio/webm\r\n\r\n`),
-      buffer,
-      Buffer.from(`\r\n--${boundary}\r\nContent-Disposition: form-data; name="model"\r\n\r\nwhisper-1\r\n--${boundary}\r\nContent-Disposition: form-data; name="language"\r\n\r\nfr\r\n--${boundary}--\r\n`)
-    ]);
+    const part1 = Buffer.from(
+      '--' + boundary + CRLF +
+      'Content-Disposition: form-data; name="file"; filename="audio.webm"' + CRLF +
+      'Content-Type: audio/webm' + CRLF + CRLF
+    );
+    const part2 = Buffer.from(
+      CRLF + '--' + boundary + CRLF +
+      'Content-Disposition: form-data; name="model"' + CRLF + CRLF +
+      'whisper-1' + CRLF +
+      '--' + boundary + CRLF +
+      'Content-Disposition: form-data; name="language"' + CRLF + CRLF +
+      'fr' + CRLF +
+      '--' + boundary + '--' + CRLF
+    );
+
+    const body = Buffer.concat([part1, audioBuffer, part2]);
 
     const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-        'Content-Type': `multipart/form-data; boundary=${boundary}`
+        'Authorization': 'Bearer ' + process.env.OPENAI_API_KEY,
+        'Content-Type': 'multipart/form-data; boundary=' + boundary
       },
       body
     });
