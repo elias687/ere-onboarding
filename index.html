@@ -770,6 +770,81 @@ h2{
   </script>
 </div>
 
+<!-- ══ SCREEN CONTACT ══ -->
+<div class="screen" id="screen-contact">
+  <div class="question-meta">
+    <span class="question-num">Vos coordonnees</span>
+    <span class="question-count">0 / 6</span>
+  </div>
+  <h2 class="question-text">Comment vous<br>contacter ?</h2>
+  <p class="question-hint">Ces informations nous permettent de vous recontacter rapidement apres reception de votre brief.</p>
+
+  <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:24px;">
+
+    <!-- Nom + Prenom -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div>
+        <div class="ref-input-label" style="margin-bottom:6px;">Prenom</div>
+        <input id="contact-prenom" type="text" placeholder="Jean" style="width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:400;padding:13px 16px;outline:none;transition:border-color 0.2s;" onfocus="this.style.borderColor='var(--text)'" onblur="this.style.borderColor='var(--border)'">
+      </div>
+      <div>
+        <div class="ref-input-label" style="margin-bottom:6px;">Nom</div>
+        <input id="contact-nom" type="text" placeholder="Dupont" style="width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:400;padding:13px 16px;outline:none;transition:border-color 0.2s;" onfocus="this.style.borderColor='var(--text)'" onblur="this.style.borderColor='var(--border)'">
+      </div>
+    </div>
+
+    <!-- Email -->
+    <div>
+      <div class="ref-input-label" style="margin-bottom:6px;">Email professionnel</div>
+      <input id="contact-email" type="email" placeholder="jean.dupont@agence.fr" style="width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:400;padding:13px 16px;outline:none;transition:border-color 0.2s;" onfocus="this.style.borderColor='var(--text)'" onblur="this.style.borderColor='var(--border)'">
+    </div>
+
+    <!-- Telephone -->
+    <div>
+      <div class="ref-input-label" style="margin-bottom:6px;">Telephone</div>
+      <input id="contact-tel" type="tel" placeholder="+33 6 xx xx xx xx" style="width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:400;padding:13px 16px;outline:none;transition:border-color 0.2s;" onfocus="this.style.borderColor='var(--text)'" onblur="this.style.borderColor='var(--border)'">
+    </div>
+
+    <!-- Site web -->
+    <div>
+      <div class="ref-input-label" style="margin-bottom:6px;">Site web de l'entreprise</div>
+      <input id="contact-site" type="url" placeholder="https://mon-agence.fr" style="width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:400;padding:13px 16px;outline:none;transition:border-color 0.2s;" onfocus="this.style.borderColor='var(--text)'" onblur="this.style.borderColor='var(--border)'">
+    </div>
+
+    <!-- Moyen de contact preferé -->
+    <div>
+      <div class="ref-input-label" style="margin-bottom:10px;">Moyen de contact prefere</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+        <div class="option-card" id="contact-whatsapp" style="flex-direction:column;align-items:center;text-align:center;gap:6px;padding:16px 10px;" onclick="selectContact('whatsapp')">
+          <span style="font-size:26px;">💬</span>
+          <div style="font-size:13px;font-weight:700;">WhatsApp</div>
+          <span class="option-check" style="margin:0;position:static;opacity:0;">✓</span>
+        </div>
+        <div class="option-card" id="contact-email-pref" style="flex-direction:column;align-items:center;text-align:center;gap:6px;padding:16px 10px;" onclick="selectContact('email')">
+          <span style="font-size:26px;">📧</span>
+          <div style="font-size:13px;font-weight:700;">Email</div>
+          <span class="option-check" style="margin:0;position:static;opacity:0;">✓</span>
+        </div>
+        <div class="option-card" id="contact-autre" style="flex-direction:column;align-items:center;text-align:center;gap:6px;padding:16px 10px;" onclick="selectContact('autre')">
+          <span style="font-size:26px;">✏️</span>
+          <div style="font-size:13px;font-weight:700;">Autre</div>
+          <span class="option-check" style="margin:0;position:static;opacity:0;">✓</span>
+        </div>
+      </div>
+      <!-- Champ "autre" conditionnel -->
+      <div id="contact-autre-field" style="display:none;margin-top:10px;">
+        <input id="contact-autre-val" type="text" placeholder="Preciser (Telegram, SMS, appel...)" style="width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:400;padding:13px 16px;outline:none;transition:border-color 0.2s;" onfocus="this.style.borderColor='var(--text)'" onblur="this.style.borderColor='var(--border)'">
+      </div>
+    </div>
+
+  </div>
+
+  <div class="form-nav">
+    <button class="btn-back" onclick="goToStep('1')" title="Retour">← Retour</button>
+    <button class="btn btn-primary" onclick="goToStep('q1')" style="flex:1;">Commencer le brief →</button>
+  </div>
+</div>
+
 <!-- ══ SCREEN Q1 : OBJECTIF ══ -->
 <div class="screen" id="screen-q1">
   <div class="question-meta">
@@ -1236,8 +1311,8 @@ var refs = [];
 var selectedContexts = 0;
 var formAnswers = {};
 
-var progressMap = {'1':8,'2a':18,'q1':28,'q1b':38,'q2':48,'q3':58,'refs':68,'refs2':80,'ai':92,'result':100};
-var dotMap = {'1':1,'2a':2,'q1':2,'q1b':2,'q2':3,'q3':3,'refs':4,'refs2':4,'ai':5,'result':5};
+var progressMap = {'1':6,'2a':16,'contact':16,'q1':26,'q1b':36,'q2':46,'q3':56,'refs':66,'refs2':78,'ai':90,'result':100};
+var dotMap = {'1':1,'2a':2,'contact':2,'q1':2,'q1b':2,'q2':3,'q3':3,'refs':4,'refs2':4,'ai':5,'result':5};
 
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
@@ -1275,7 +1350,7 @@ function selectStart(mode){
 }
 
 function goFromStart(){
-  showScreen(startMode==='call' ? '2a' : 'q1');
+  showScreen(startMode==='call' ? '2a' : 'contact');
 }
 
 function confirmBooking(){
@@ -1295,9 +1370,31 @@ function selectOption(el){
   el.classList.add('selected');
 }
 
-// Plateformes — sélection multiple
+// Plateformes — selection multiple
 function togglePlatform(el){
   el.classList.toggle('selected');
+}
+
+// Contact — moyen de communication
+var selectedContact = '';
+function selectContact(mode){
+  selectedContact = mode;
+  ['whatsapp','email-pref','autre'].forEach(function(id){
+    var card = document.getElementById('contact-' + id);
+    if(card){
+      card.classList.remove('selected');
+      var check = card.querySelector('.option-check');
+      if(check) check.style.opacity = '0';
+    }
+  });
+  var chosen = document.getElementById('contact-' + mode);
+  if(chosen){
+    chosen.classList.add('selected');
+    var check = chosen.querySelector('.option-check');
+    if(check) check.style.opacity = '1';
+  }
+  var autreField = document.getElementById('contact-autre-field');
+  if(autreField) autreField.style.display = mode === 'autre' ? 'block' : 'none';
 }
 
 // Inserer une cible dans le textarea Q2
@@ -1485,9 +1582,22 @@ function checkRefsValid(){
 }
 
 function collectFormData(){
+  // CONTACT
+  var prenom = (document.getElementById('contact-prenom') || {}).value || '';
+  var nom = (document.getElementById('contact-nom') || {}).value || '';
+  var email = (document.getElementById('contact-email') || {}).value || '';
+  var tel = (document.getElementById('contact-tel') || {}).value || '';
+  var site = (document.getElementById('contact-site') || {}).value || '';
+  var autreContact = (document.getElementById('contact-autre-val') || {}).value || '';
+  var moyenContact = selectedContact === 'autre' ? autreContact : selectedContact;
+
   // Q1 - objectif
   var q1el = document.querySelector('#screen-q1 .option-card.selected');
-  var q1 = q1el ? q1el.textContent.trim() : 'Non precise';
+  var q1 = q1el ? q1el.querySelector('div > div:first-child') ? q1el.querySelector('div > div:first-child').textContent.trim() : q1el.textContent.trim() : 'Non precise';
+
+  // Q1b - plateformes
+  var plateformes = Array.from(document.querySelectorAll('#screen-q1b .option-card.selected div[style*="font-weight:700"]'))
+    .map(function(e){ return e.textContent.trim(); }).join(', ') || 'Non precise';
 
   // Q2 - audience
   var q2text = document.getElementById('q2-text');
@@ -1508,7 +1618,15 @@ function collectFormData(){
   var avoid = document.getElementById('ref-avoid') ? document.getElementById('ref-avoid').value.trim() : '';
 
   return {
+    // Infos client
+    nomClient: ((prenom + ' ' + nom).trim()) || 'Non precise',
+    email: email || 'Non precise',
+    telephone: tel || 'Non precise',
+    siteWeb: site || 'Non precise',
+    moyenContact: moyenContact || 'Non precise',
+    // Brief
     objectif: q1,
+    plateformes: plateformes,
     audience: q2,
     messageCle: messageCle || 'Non precise',
     format: format,
