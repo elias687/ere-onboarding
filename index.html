@@ -823,8 +823,8 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1;}
 
     <!-- Email -->
     <div>
-      <div class="ref-input-label" style="margin-bottom:6px;">Email professionnel</div>
-      <input id="contact-email" type="email" placeholder="jean.dupont@agence.fr" style="width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:400;padding:13px 16px;outline:none;transition:border-color 0.2s;" onfocus="this.style.borderColor='var(--text)'" onblur="this.style.borderColor='var(--border)'">
+      <div class="ref-input-label" style="margin-bottom:6px;">Adresse professionnelle</div>
+      <input id="contact-courriel" type="text" inputmode="email" autocomplete="email" placeholder="jean.dupont@agence.fr" style="width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:400;padding:13px 16px;outline:none;transition:border-color 0.2s;" onfocus="this.style.borderColor='var(--text)'" onblur="this.style.borderColor='var(--border)'">
     </div>
 
     <!-- Telephone -->
@@ -848,7 +848,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1;}
           <div style="font-size:13px;font-weight:700;">WhatsApp</div>
           <span class="option-check" style="margin:0;position:static;opacity:0;">✓</span>
         </div>
-        <div class="option-card" id="contact-email-pref" style="flex-direction:column;align-items:center;text-align:center;gap:6px;padding:16px 10px;" onclick="selectContact('email')">
+        <div class="option-card" id="contact-mail-pref" style="flex-direction:column;align-items:center;text-align:center;gap:6px;padding:16px 10px;" onclick="selectContact('email')">
           <span style="font-size:26px;">📧</span>
           <div style="font-size:13px;font-weight:700;">Email</div>
           <span class="option-check" style="margin:0;position:static;opacity:0;">✓</span>
@@ -1393,7 +1393,13 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1;}
   <div class="integrations-row">
     <div class="integration-chip" id="chip-sheets"><span class="integration-icon">📊</span> Google Sheets</div>
     <div class="integration-chip" id="chip-slides"><span class="integration-icon">🖼️</span> Google Slides</div>
-    <div class="integration-chip" id="chip-make"><span class="integration-icon">⚡</span> Make.com</div>
+    <div class="integration-chip" id="chip-make" title=""><span class="integration-icon">⚡</span> Make.com</div>
+  </div>
+
+  <!-- Warning Make discret -->
+  <div id="make-warn" style="display:none;align-items:center;gap:8px;padding:10px 14px;background:rgba(224,48,48,0.06);border:1px solid rgba(224,48,48,0.2);border-radius:var(--r-sm);font-size:12px;color:var(--danger);margin-bottom:4px;">
+    <span>⚠️</span>
+    <span>L'automatisation Make n'a pas ete declenchee. Verifiez que le scenario PROFILE&SLIDES est <strong>actif</strong> et que la variable <strong>MAKE_WEBHOOK_URL</strong> est bien configuree sur Vercel.</span>
   </div>
 
   <div style="padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:16px;">
@@ -1770,7 +1776,7 @@ function collectFormData(){
   // CONTACT
   var prenom = (document.getElementById('contact-prenom') || {}).value || '';
   var nom = (document.getElementById('contact-nom') || {}).value || '';
-  var email = (document.getElementById('contact-email') || {}).value || '';
+  var email = (document.getElementById('contact-courriel') || {}).value || '';
   var tel = (document.getElementById('contact-tel') || {}).value || '';
   var site = (document.getElementById('contact-site') || {}).value || '';
   var autreContact = (document.getElementById('contact-autre-val') || {}).value || '';
@@ -1868,13 +1874,16 @@ async function startAI(){
         el3.classList.add('done');
         el3.querySelector('.ai-step-icon').textContent = 'ok';
 
+        // Recuperer le statut Make et le retirer du brief avant affichage
+        var makeOk = brief._makeOk !== false;
+        delete brief._makeOk;
+
         animStep(3, function(){
           animStep(4, function(){
-            // Afficher le brief reel
             displayBrief(brief, data);
             setTimeout(function(){
               showScreen('result');
-              animateIntegrations();
+              animateIntegrations(makeOk);
             }, 400);
           });
         });
@@ -1882,11 +1891,10 @@ async function startAI(){
         el3.classList.remove('active');
         el3.querySelector('.ai-step-icon').textContent = '!';
         document.getElementById('ai-substatus').textContent = 'Erreur : ' + err.message;
-        // Afficher quand meme avec donnees brutes
         displayBrief(null, data);
         setTimeout(function(){
           showScreen('result');
-          animateIntegrations();
+          animateIntegrations(false);
         }, 1500);
       });
     });
@@ -1951,8 +1959,9 @@ function displayBrief(brief, rawData){
   });
 }
 
-function animateIntegrations(){
-  var chips = [{id:'chip-sheets',delay:400},{id:'chip-slides',delay:1100},{id:'chip-make',delay:1800}];
+function animateIntegrations(makeOk){
+  // Sheets + Slides : toujours OK (donnees stockees par Claude)
+  var chips = [{id:'chip-sheets',delay:400},{id:'chip-slides',delay:900}];
   chips.forEach(function(c){
     setTimeout(function(){
       var el = document.getElementById(c.id);
@@ -1961,9 +1970,31 @@ function animateIntegrations(){
         el.classList.remove('sending');
         el.classList.add('sent');
         el.querySelector('.integration-icon').textContent = 'ok';
-      },700);
+      },600);
     },c.delay);
   });
+
+  // Make.com : afficher le vrai statut
+  setTimeout(function(){
+    var el = document.getElementById('chip-make');
+    el.classList.add('sending');
+    setTimeout(function(){
+      el.classList.remove('sending');
+      if(makeOk === false){
+        // Echec webhook Make
+        el.style.borderColor = 'var(--danger)';
+        el.style.color = 'var(--danger)';
+        el.querySelector('.integration-icon').textContent = '!';
+        el.title = 'Webhook Make non declenche - verifiez la configuration';
+        // Afficher un message d'avertissement discret
+        var warn = document.getElementById('make-warn');
+        if(warn) warn.style.display = 'flex';
+      } else {
+        el.classList.add('sent');
+        el.querySelector('.integration-icon').textContent = 'ok';
+      }
+    },700);
+  },1400);
 }
 </script>
 </body>
