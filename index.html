@@ -1084,14 +1084,40 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1;}
       </div>
     </div>
 
-    <!-- BRIEF EXISTANT -->
+    <!-- BRIEF EXISTANT PDF -->
     <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:18px 20px;">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
-        <span style="font-size:18px;">📎</span>
-        <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:14px;font-weight:800;">Vous avez deja un brief ?</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+        <span style="font-size:20px;">📄</span>
+        <div>
+          <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:14px;font-weight:800;color:var(--text);">Vous avez deja un brief ?</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:1px;">Claude lira votre document et l'integrera dans l'analyse</div>
+        </div>
       </div>
-      <div style="font-size:13px;color:var(--muted);margin-bottom:12px;">Collez un lien (Google Drive, Notion, Figma...) ou decrivez-le brievement.</div>
-      <input id="q3-brief-existant" type="url" placeholder="https://drive.google.com/... ou notion.so/..." style="width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;padding:12px 14px;outline:none;transition:border-color 0.2s;" onfocus="this.style.borderColor='var(--text)'" onblur="this.style.borderColor='var(--border)'">
+
+      <!-- Zone drop PDF -->
+      <div id="pdf-drop-zone"
+           onclick="document.getElementById('pdf-input').click()"
+           ondragover="event.preventDefault();this.style.borderColor='var(--text)'"
+           ondragleave="this.style.borderColor='var(--border)'"
+           ondrop="handlePdfDrop(event)"
+           style="border:1.5px dashed var(--border);border-radius:var(--r);padding:24px 16px;text-align:center;cursor:pointer;transition:all 0.2s;margin-top:12px;">
+        <div style="font-size:28px;margin-bottom:8px;">📎</div>
+        <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Deposez votre PDF ici</div>
+        <div style="font-size:12px;color:var(--muted);">ou cliquez pour parcourir · PDF uniquement · max 10 Mo</div>
+      </div>
+      <input type="file" id="pdf-input" accept=".pdf" style="display:none;" onchange="handlePdfSelect(this)">
+
+      <!-- Etat apres upload -->
+      <div id="pdf-state" style="display:none;margin-top:10px;">
+        <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--bg);border:1.5px solid var(--text);border-radius:var(--r);">
+          <span style="font-size:18px;">✅</span>
+          <div style="flex:1;min-width:0;">
+            <div id="pdf-filename" style="font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
+            <div id="pdf-filesize" style="font-size:11px;color:var(--muted);margin-top:1px;"></div>
+          </div>
+          <button onclick="clearPdf()" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:18px;padding:0;line-height:1;transition:color 0.2s;" onmouseover="this.style.color='var(--danger)'" onmouseout="this.style.color='var(--muted)'">✕</button>
+        </div>
+      </div>
     </div>
 
     <!-- FORMAT -->
@@ -1455,6 +1481,52 @@ function togglePlatform(el){
   el.classList.toggle('selected');
 }
 
+// ══ PDF BRIEF EXISTANT ══
+var briefPdfBase64 = null;
+var briefPdfName = '';
+
+function handlePdfSelect(input){
+  if(input.files && input.files[0]){
+    loadPdf(input.files[0]);
+  }
+}
+
+function handlePdfDrop(event){
+  event.preventDefault();
+  document.getElementById('pdf-drop-zone').style.borderColor = 'var(--border)';
+  var file = event.dataTransfer.files[0];
+  if(file && file.type === 'application/pdf'){
+    loadPdf(file);
+  }
+}
+
+function loadPdf(file){
+  if(file.size > 10 * 1024 * 1024){
+    alert('Le fichier est trop lourd (max 10 Mo). Compressez votre PDF et reessayez.');
+    return;
+  }
+  var reader = new FileReader();
+  reader.onload = function(e){
+    briefPdfBase64 = e.target.result.split(',')[1];
+    briefPdfName = file.name;
+    // Afficher etat
+    document.getElementById('pdf-drop-zone').style.display = 'none';
+    document.getElementById('pdf-state').style.display = 'block';
+    document.getElementById('pdf-filename').textContent = file.name;
+    var kb = Math.round(file.size / 1024);
+    document.getElementById('pdf-filesize').textContent = kb > 1024 ? (kb/1024).toFixed(1) + ' Mo' : kb + ' Ko';
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearPdf(){
+  briefPdfBase64 = null;
+  briefPdfName = '';
+  document.getElementById('pdf-drop-zone').style.display = 'block';
+  document.getElementById('pdf-state').style.display = 'none';
+  document.getElementById('pdf-input').value = '';
+}
+
 // Deadline — pills rapides
 function selectDeadline(el, val){
   document.querySelectorAll('.deadline-pill').forEach(function(p){ p.classList.remove('selected'); });
@@ -1723,7 +1795,7 @@ function collectFormData(){
   var q3msgVoice = (document.getElementById('q3msg-transcribed') || {}).value || '';
   var messageCle = q3msgVoice.trim() || q3msgText.trim() || 'Non precise';
   var deadline = (document.getElementById('deadline-value') || {}).value || 'Non precise';
-  var briefExistant = (document.getElementById('q3-brief-existant') || {}).value || '';
+  var briefExistant = briefPdfName || '';
   var formatEl = document.querySelector('#screen-q3 .option-card.selected');
   var format = formatEl ? (formatEl.querySelector('span:nth-child(2)') ? formatEl.querySelector('span:nth-child(2)').textContent.trim() : formatEl.textContent.trim()) : 'Non precise';
 
@@ -1822,10 +1894,17 @@ async function startAI(){
 }
 
 async function generateBriefWithClaude(data){
+  // Ajouter le PDF en base64 si present
+  var payload = Object.assign({}, data);
+  if(briefPdfBase64){
+    payload.pdfBase64 = briefPdfBase64;
+    payload.pdfName = briefPdfName;
+  }
+
   var response = await fetch('/api/brief', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
+    body: JSON.stringify(payload)
   });
 
   if(!response.ok){
