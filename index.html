@@ -234,6 +234,21 @@ h2{font-family:'Syne',sans-serif;font-size:clamp(20px,4vw,28px);font-weight:700;
 </style>
 </head>
 <body>
+    <div style="margin-bottom:24px;">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:#c8f04a;font-weight:600;margin-bottom:8px;">Cle Anthropic <span style="opacity:0.5;font-size:10px;">(pour la generation du brief avec Claude)</span></div>
+      <input id="input-anthropic-key" type="password" placeholder="sk-ant-..." style="width:100%;background:#080808;border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#f0ede8;font-family:monospace;font-size:13px;padding:12px 14px;outline:none;" onfocus="this.style.borderColor='rgba(200,240,74,0.4)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
+    </div>
+
+    <button onclick="saveKeys()" style="width:100%;background:#c8f04a;color:#080808;border:none;border-radius:8px;font-family:DM Sans,sans-serif;font-size:14px;font-weight:600;padding:14px;cursor:pointer;">
+      Enregistrer et continuer →
+    </button>
+
+    <div style="margin-top:16px;font-size:11px;color:rgba(240,237,232,0.3);text-align:center;line-height:1.6;">
+      Les cles sont stockees uniquement dans votre navigateur (localStorage).<br>Elles ne transitent jamais par nos serveurs.
+    </div>
+  </div>
+</div>
+
 <div class="shell">
 
 <header class="topbar">
@@ -645,8 +660,11 @@ var startMode = null;
 var currentScreen = '1';
 var recordings = {};
 var timers = {};
+var mediaRecorders = {};
+var audioChunks = {};
 var refs = [];
 var selectedContexts = 0;
+var formAnswers = {};
 
 var progressMap = {'1':8,'2a':22,'q1':36,'q2':50,'q3':64,'refs':78,'ai':90,'result':100};
 var dotMap = {'1':1,'2a':2,'q1':2,'q2':3,'q3':3,'refs':4,'ai':5,'result':5};
@@ -720,48 +738,40 @@ function toggleRecording(qid){
   var timer = document.getElementById(qid+'-timer');
   var waveform = document.getElementById(qid+'-waveform');
 
-  // ── DEJA EN COURS : STOP ──
+  // STOP si deja en cours
   if(recordings[qid]){
     recordings[qid] = false;
     clearInterval(timers[qid]);
-    timer.style.display = 'none';
-    waveform.style.display = 'none';
+    if(mediaRecorders[qid] && mediaRecorders[qid].state !== 'inactive'){
+      mediaRecorders[qid].stop();
+    }
     btn.classList.remove('recording');
     btn.textContent = 'MIC';
     btn.style.fontSize = '26px';
     btn.style.fontWeight = '';
-
-    // Stopper la reconnaissance si active
-    if(speechRecognitions[qid]){
-      try { speechRecognitions[qid].stop(); } catch(e){}
-    }
-    return;
-  }
-
-  // ── DEMARRER ──
-  var SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition || null;
-
-  // Verifier support navigateur
-  if(!SpeechRec){
-    label.textContent = 'Votre navigateur ne supporte pas la voix. Utilisez Chrome ou Safari.';
-    label.style.color = 'var(--danger)';
+    timer.style.display = 'none';
+    waveform.style.display = 'none';
+    label.textContent = 'Transcription Whisper en cours...';
     return;
   }
 
   // Demander acces micro
-  navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
-    stream.getTracks().forEach(function(t){ t.stop(); }); // juste pour la permission
+  navigator.mediaDevices.getUserMedia({audio:true, video:false}).then(function(stream){
+    audioChunks[qid] = [];
+    var recorder = new MediaRecorder(stream, {mimeType: 'audio/webm'});
+    mediaRecorders[qid] = recorder;
 
-    // ── LANCER Speech Recognition ──
-    var recognition = new SpeechRec();
-    recognition.lang = 'fr-FR';
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    speechRecognitions[qid] = recognition;
+    recorder.ondataavailable = function(e){
+      if(e.data.size > 0) audioChunks[qid].push(e.data);
+    };
 
-    var fullTranscript = '';
-    var interimText = '';
+    recorder.onstop = function(){
+      stream.getTracks().forEach(function(t){ t.stop(); });
+      var blob = new Blob(audioChunks[qid], {type: 'audio/webm'});
+      transcribeWithWhisper(blob, qid);
+    };
 
+    recorder.start(1000); // chunk toutes les secondes
     recordings[qid] = true;
     btn.classList.add('recording');
     btn.textContent = 'STOP';
@@ -772,7 +782,6 @@ function toggleRecording(qid){
     timer.style.display = 'block';
     waveform.style.display = 'flex';
 
-    // Timer
     var secs = 0;
     timers[qid] = setInterval(function(){
       secs++;
@@ -781,53 +790,42 @@ function toggleRecording(qid){
       timer.textContent = m+':'+(s<10?'0':'')+s;
     },1000);
 
-    // Afficher textarea en temps reel
-    var ta = document.getElementById(qid+'-transcription');
-    var tx = document.getElementById(qid+'-transcribed');
-    ta.style.display = 'block';
-
-    recognition.onresult = function(event){
-      interimText = '';
-      for(var i = event.resultIndex; i < event.results.length; i++){
-        if(event.results[i].isFinal){
-          fullTranscript += event.results[i][0].transcript + ' ';
-        } else {
-          interimText += event.results[i][0].transcript;
-        }
-      }
-      tx.value = fullTranscript + interimText;
-      label.textContent = 'Transcription en direct...';
-    };
-
-    recognition.onerror = function(event){
-      if(event.error === 'no-speech') return;
-      label.textContent = 'Erreur micro : ' + event.error;
-      label.style.color = 'var(--danger)';
-      clearInterval(timers[qid]);
-      recordings[qid] = false;
-      btn.classList.remove('recording');
-      btn.textContent = 'MIC';
-      btn.style.fontSize = '26px';
-      timer.style.display = 'none';
-      waveform.style.display = 'none';
-    };
-
-    recognition.onend = function(){
-      // Relancer automatiquement si toujours en mode recording (continuous workaround)
-      if(recordings[qid]){
-        try { recognition.start(); } catch(e){}
-      } else {
-        label.textContent = 'Transcription terminee ✓';
-        label.style.color = 'var(--accent)';
-      }
-    };
-
-    recognition.start();
-
-  }).catch(function(){
-    label.textContent = 'Acces au microphone refuse. Autorisez-le dans votre navigateur.';
+  }).catch(function(err){
+    label.textContent = 'Micro inaccessible : autorisez-le dans Chrome (icone cadenas dans la barre URL).';
     label.style.color = 'var(--danger)';
   });
+}
+
+async function transcribeWithWhisper(audioBlob, qid){
+  var label = document.getElementById(qid+'-voice-label');
+  var ta = document.getElementById(qid+'-transcription');
+  var tx = document.getElementById(qid+'-transcribed');
+
+  label.textContent = 'Transcription en cours...';
+  label.style.color = 'var(--muted)';
+  ta.style.display = 'block';
+  tx.value = '';
+
+  try {
+    var response = await fetch('/api/transcribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'audio/webm' },
+      body: audioBlob
+    });
+
+    if(!response.ok){
+      var err = await response.json();
+      throw new Error(err.error || 'Erreur transcription');
+    }
+
+    var data = await response.json();
+    tx.value = data.text || '';
+    label.textContent = 'Transcription terminee ✓';
+    label.style.color = 'var(--accent)';
+  } catch(e){
+    label.textContent = 'Erreur : ' + e.message;
+    label.style.color = 'var(--danger)';
+  }
 }
 
 function selectContext(el){
@@ -896,26 +894,158 @@ function checkRefsValid(){
   }
 }
 
-function startAI(){
+function collectFormData(){
+  // Q1 - objectif
+  var q1el = document.querySelector('#screen-q1 .option-card.selected');
+  var q1 = q1el ? q1el.textContent.trim() : 'Non precise';
+
+  // Q2 - audience
+  var q2text = document.getElementById('q2-text');
+  var q2transcribed = document.getElementById('q2-transcribed');
+  var q2 = (q2transcribed && q2transcribed.value.trim()) ? q2transcribed.value.trim() : (q2text ? q2text.value.trim() : '');
+  if(!q2) q2 = 'Non precise';
+
+  // Q3 - message cle
+  var q3fields = document.querySelectorAll('#screen-q3 .answer-textarea');
+  var messageCle = q3fields[0] ? q3fields[0].value.trim() : '';
+  var deadline = q3fields[1] ? q3fields[1].value.trim() : '';
+  var formatEl = document.querySelector('#screen-q3 .option-card.selected');
+  var format = formatEl ? formatEl.textContent.trim() : 'Non precise';
+
+  // Refs
+  var contextsEl = document.querySelectorAll('#ref-context .ref-context-card.selected .ref-context-label');
+  var contexts = Array.from(contextsEl).map(function(e){ return e.textContent.trim(); }).join(', ');
+  var avoid = document.getElementById('ref-avoid') ? document.getElementById('ref-avoid').value.trim() : '';
+
+  return {
+    objectif: q1,
+    audience: q2,
+    messageCle: messageCle || 'Non precise',
+    format: format,
+    deadline: deadline || 'Non precise',
+    references: refs.join(', ') || 'Non precise',
+    aspectsInspiration: contexts || 'Non precise',
+    aEviter: avoid || 'Rien de specifique'
+  };
+}
+
+async function startAI(){
   showScreen('ai');
+
+  var data = collectFormData();
+
   var steps = ['ai-step-1','ai-step-2','ai-step-3','ai-step-4','ai-step-5'];
-  var labels = ['Reformulation...','Extraction des cles...','Analyse des references...','Structuration du brief...','Envoi Sheets et Slides...'];
-  var i = 0;
-  function runStep(){
-    if(i>=steps.length){ setTimeout(function(){ showScreen('result'); animateIntegrations(); },700); return; }
-    var el = document.getElementById(steps[i]);
+  var labels = [
+    'Analyse de vos reponses...',
+    'Extraction des informations cles...',
+    'Generation du brief avec Claude...',
+    'Structuration et scoring...',
+    'Finalisation...'
+  ];
+
+  // Animer les 2 premiers steps pendant la requete API
+  function animStep(idx, cb){
+    if(idx >= steps.length){ cb && cb(); return; }
+    var el = document.getElementById(steps[idx]);
     el.classList.add('active');
     el.querySelector('.ai-step-icon').innerHTML = '<div class="ai-step-spinner"></div>';
-    document.getElementById('ai-substatus').textContent = labels[i];
+    document.getElementById('ai-substatus').textContent = labels[idx];
     setTimeout(function(){
       el.classList.remove('active');
       el.classList.add('done');
       el.querySelector('.ai-step-icon').textContent = 'ok';
-      i++;
-      setTimeout(runStep,280);
-    }, 850+Math.random()*250);
+      cb && cb();
+    }, 900 + Math.random()*300);
   }
-  setTimeout(runStep,500);
+
+  // Lancer steps 1 et 2 puis appel API
+  animStep(0, function(){
+    animStep(1, function(){
+      // Step 3 en loading pendant l'appel Claude
+      var el3 = document.getElementById(steps[2]);
+      el3.classList.add('active');
+      el3.querySelector('.ai-step-icon').innerHTML = '<div class="ai-step-spinner"></div>';
+      document.getElementById('ai-substatus').textContent = labels[2];
+
+      generateBriefWithClaude(data).then(function(brief){
+        el3.classList.remove('active');
+        el3.classList.add('done');
+        el3.querySelector('.ai-step-icon').textContent = 'ok';
+
+        animStep(3, function(){
+          animStep(4, function(){
+            // Afficher le brief reel
+            displayBrief(brief, data);
+            setTimeout(function(){
+              showScreen('result');
+              animateIntegrations();
+            }, 400);
+          });
+        });
+      }).catch(function(err){
+        el3.classList.remove('active');
+        el3.querySelector('.ai-step-icon').textContent = '!';
+        document.getElementById('ai-substatus').textContent = 'Erreur : ' + err.message;
+        // Afficher quand meme avec donnees brutes
+        displayBrief(null, data);
+        setTimeout(function(){
+          showScreen('result');
+          animateIntegrations();
+        }, 1500);
+      });
+    });
+  });
+}
+
+async function generateBriefWithClaude(data){
+  var response = await fetch('/api/brief', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+
+  if(!response.ok){
+    var err = await response.json();
+    throw new Error(err.error || 'Erreur generation brief');
+  }
+
+  return await response.json();
+}
+
+function displayBrief(brief, rawData){
+  if(!brief){
+    // Fallback avec donnees brutes
+    brief = {
+      objectif: rawData.objectif,
+      audience: rawData.audience,
+      messageCle: rawData.messageCle,
+      directionCreative: 'Basee sur les references : ' + rawData.references,
+      aEviter: rawData.aEviter,
+      livrable: rawData.format + ' - ' + rawData.deadline,
+      score: 72
+    };
+  }
+
+  // Score
+  document.querySelector('.brief-score-num').textContent = brief.score || 85;
+
+  // Sections
+  var sections = document.querySelectorAll('.brief-section');
+  var mapping = [
+    { label: 'Objectif', val: brief.objectif },
+    { label: 'Audience cible', val: brief.audience },
+    { label: 'Message cle', val: brief.messageCle },
+    { label: 'Direction creative', val: brief.directionCreative },
+    { label: 'A eviter absolument', val: brief.aEviter },
+    { label: 'Livrable', val: brief.livrable }
+  ];
+
+  sections.forEach(function(section, i){
+    if(mapping[i]){
+      var content = section.querySelector('.brief-section-content');
+      if(content) content.textContent = mapping[i].val;
+    }
+  });
 }
 
 function animateIntegrations(){
