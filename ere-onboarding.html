@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ERE Agency — Onboarding</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080808;
+  --surface: #101010;
+  --surface2: #161616;
+  --border: rgba(255,255,255,0.07);
+  --text: #f0ede8;
+  --muted: rgba(240,237,232,0.4);
+  --accent: #c8f04a;
+  --accent-dim: rgba(200,240,74,0.10);
+  --accent-border: rgba(200,240,74,0.28);
+  --danger: #ff4f4f;
+  --warning: #f0a030;
+  --warning-dim: rgba(240,160,48,0.10);
+  --warning-border: rgba(240,160,48,0.28);
+  --green: rgba(80,210,120,0.9);
+  --green-dim: rgba(80,210,120,0.08);
+  --green-border: rgba(80,210,120,0.28);
+  --r: 12px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:999;opacity:0.6;}
+.shell{min-height:100vh;display:flex;flex-direction:column;}
+
+/* TOPBAR */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:20px 32px;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(8,8,8,0.92);backdrop-filter:blur(16px);z-index:100;}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:17px;letter-spacing:0.05em;}
+.logo span{color:var(--accent);}
+.step-indicator{display:flex;align-items:center;gap:8px;}
+.step-dot{width:6px;height:6px;border-radius:50%;background:var(--border);border:1px solid rgba(255,255,255,0.15);transition:all 0.3s;}
+.step-dot.active{background:var(--accent);border-color:var(--accent);box-shadow:0 0 8px rgba(200,240,74,0.5);}
+.step-dot.done{background:rgba(200,240,74,0.35);border-color:transparent;}
+
+/* PROGRESS */
+.progress-bar{height:2px;background:var(--border);overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,rgba(200,240,74,0.4),var(--accent));transition:width 0.5s cubic-bezier(0.22,1,0.36,1);position:relative;}
+.progress-fill::after{content:'';position:absolute;right:0;top:0;bottom:0;width:60px;background:linear-gradient(90deg,transparent,rgba(200,240,74,0.8));filter:blur(3px);}
+
+/* MAIN */
+main{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:40px 24px;}
+
+/* SCREEN */
+.screen{display:none;width:100%;max-width:640px;animation:fadeUp 0.4s cubic-bezier(0.22,1,0.36,1);}
+.screen.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+
+/* TAG */
+.tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);background:var(--accent-dim);border:1px solid var(--accent-border);padding:5px 12px;border-radius:99px;margin-bottom:22px;}
+.tag-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite;}
+.tag-warn{color:var(--warning);background:var(--warning-dim);border-color:var(--warning-border);}
+.tag-warn .tag-dot{background:var(--warning);}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+
+/* HEADINGS */
+h1{font-family:'Syne',sans-serif;font-size:clamp(26px,5vw,40px);font-weight:800;line-height:1.1;margin-bottom:12px;letter-spacing:-0.02em;}
+h1 em{font-style:normal;color:var(--accent);}
+h2{font-family:'Syne',sans-serif;font-size:clamp(20px,4vw,28px);font-weight:700;line-height:1.2;margin-bottom:10px;letter-spacing:-0.01em;}
+.sub{color:var(--muted);font-size:15px;line-height:1.65;margin-bottom:32px;font-weight:300;}
+
+/* NOTICE */
+.notice{display:flex;align-items:flex-start;gap:10px;border-radius:8px;padding:14px 16px;margin-bottom:20px;font-size:13px;line-height:1.6;}
+.notice-warning{background:var(--warning-dim);border:1px solid var(--warning-border);color:rgba(240,237,232,0.75);}
+.notice-info{background:var(--accent-dim);border:1px solid var(--accent-border);color:rgba(240,237,232,0.75);}
+.notice-icon{font-size:16px;flex-shrink:0;margin-top:1px;}
+
+/* CHOICE CARDS */
+.choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+.choice-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:22px 18px;cursor:pointer;transition:all 0.25s;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:10px;}
+.choice-card:hover{border-color:var(--accent-border);}
+.choice-card.selected{border-color:var(--accent);background:rgba(200,240,74,0.05);}
+.choice-icon{font-size:28px;}
+.choice-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;}
+.choice-desc{font-size:12px;color:var(--muted);line-height:1.55;font-weight:300;}
+.choice-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;padding:3px 8px;border-radius:4px;width:fit-content;}
+.badge-rec{background:var(--accent-dim);border:1px solid var(--accent-border);color:var(--accent);}
+.badge-quick{background:rgba(120,120,255,0.1);border:1px solid rgba(120,120,255,0.25);color:rgba(160,160,255,0.9);}
+.choice-check{position:absolute;top:14px;right:14px;width:20px;height:20px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;color:#080808;font-weight:700;opacity:0;transition:opacity 0.2s;}
+.choice-card.selected .choice-check{opacity:1;}
+
+/* BOOKING */
+.booking-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;display:flex;align-items:center;gap:16px;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden;}
+.booking-card:hover{border-color:var(--accent-border);}
+.booking-icon{width:44px;height:44px;background:var(--accent-dim);border:1px solid var(--accent-border);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.booking-info h3{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:3px;}
+.booking-info p{color:var(--muted);font-size:12px;}
+.booking-arrow{margin-left:auto;color:var(--muted);font-size:18px;transition:transform 0.2s,color 0.2s;flex-shrink:0;}
+.booking-card:hover .booking-arrow{transform:translateX(4px);color:var(--accent);}
+.confirmed-badge{display:inline-flex;align-items:center;gap:8px;background:var(--green-dim);border:1px solid var(--green-border);border-radius:8px;padding:10px 16px;font-size:13px;color:var(--green);}
+
+/* BTNS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 28px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;border:none;transition:all 0.2s;letter-spacing:0.01em;}
+.btn-primary{background:var(--accent);color:#080808;width:100%;}
+.btn-primary:hover:not(:disabled){background:#d9ff5a;box-shadow:0 0 24px rgba(200,240,74,0.28);transform:translateY(-1px);}
+.btn-primary:disabled{opacity:0.35;cursor:not-allowed;}
+.btn-back{background:var(--surface);border:1px solid var(--border);color:var(--muted);padding:14px 20px;border-radius:8px;cursor:pointer;font-size:18px;transition:all 0.2s;flex-shrink:0;}
+.btn-back:hover{color:var(--text);border-color:rgba(255,255,255,0.2);}
+.form-nav{display:flex;gap:12px;margin-top:24px;}
+.sep{height:1px;background:var(--border);margin:22px 0;}
+
+/* QUESTION FORM */
+.question-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;}
+.question-num{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;letter-spacing:0.15em;color:var(--accent);text-transform:uppercase;}
+.question-count{color:var(--muted);font-size:12px;}
+.question-text{font-family:'Syne',sans-serif;font-size:clamp(19px,3vw,25px);font-weight:700;line-height:1.25;margin-bottom:8px;letter-spacing:-0.01em;}
+.question-hint{color:var(--muted);font-size:13px;margin-bottom:24px;font-weight:300;line-height:1.6;}
+
+/* TEXTAREA */
+.answer-textarea{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:300;line-height:1.6;padding:16px 18px;resize:none;min-height:100px;outline:none;transition:border-color 0.2s,box-shadow 0.2s;}
+.answer-textarea:focus{border-color:rgba(200,240,74,0.35);box-shadow:0 0 0 3px rgba(200,240,74,0.05);}
+.answer-textarea::placeholder{color:rgba(240,237,232,0.18);}
+
+/* INPUT TABS */
+.input-tabs{display:flex;gap:8px;margin-bottom:14px;}
+.input-tab{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:6px;background:var(--surface);border:1px solid var(--border);color:var(--muted);font-size:12px;font-weight:500;cursor:pointer;transition:all 0.2s;}
+.input-tab.active{background:var(--accent-dim);border-color:var(--accent-border);color:var(--accent);}
+
+/* OPTION CARDS */
+.option-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px;}
+.option-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:10px;font-size:14px;}
+.option-card:hover{border-color:var(--accent-border);background:var(--accent-dim);}
+.option-card.selected{border-color:var(--accent);background:var(--accent-dim);}
+.option-check{margin-left:auto;color:var(--accent);font-size:14px;opacity:0;transition:opacity 0.2s;}
+.option-card.selected .option-check{opacity:1;}
+.option-emoji{font-size:18px;}
+
+/* ══ REFERENCES PAGE ══ */
+.ref-mandatory-banner{background:linear-gradient(135deg,rgba(240,160,48,0.10),rgba(200,240,74,0.05));border:1px solid var(--warning-border);border-radius:var(--r);padding:20px;margin-bottom:22px;position:relative;overflow:hidden;}
+.ref-mandatory-banner::before{content:'';position:absolute;top:-1px;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--warning),var(--accent));}
+.ref-mandatory-title{font-family:'Syne',sans-serif;font-weight:800;font-size:17px;margin-bottom:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.badge-critical{font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;background:rgba(240,160,48,0.18);border:1px solid var(--warning-border);color:var(--warning);padding:3px 8px;border-radius:4px;}
+.ref-mandatory-body{font-size:13px;color:rgba(240,237,232,0.7);line-height:1.75;}
+.ref-mandatory-body strong{color:var(--text);}
+
+.ref-why-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:24px;}
+.ref-why-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 12px;display:flex;flex-direction:column;gap:6px;}
+.ref-why-icon{font-size:20px;}
+.ref-why-title{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;}
+.ref-why-desc{font-size:11px;color:var(--muted);line-height:1.5;font-weight:300;}
+
+.ref-input-label{font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent);font-weight:600;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;}
+.ref-counter{font-size:11px;color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0;}
+.ref-counter.ok{color:var(--green);}
+
+.ref-context-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;}
+.ref-context-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;cursor:pointer;transition:all 0.2s;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;}
+.ref-context-card:hover{border-color:var(--accent-border);background:var(--accent-dim);}
+.ref-context-card.selected{border-color:var(--accent);background:var(--accent-dim);}
+.ref-context-icon{font-size:20px;}
+.ref-context-label{font-size:11px;font-weight:600;font-family:'Syne',sans-serif;}
+
+.ref-chips-input{display:flex;flex-wrap:wrap;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px;min-height:56px;cursor:text;transition:border-color 0.2s,box-shadow 0.2s;margin-bottom:8px;align-items:center;}
+.ref-chips-input:focus-within{border-color:rgba(200,240,74,0.35);box-shadow:0 0 0 3px rgba(200,240,74,0.05);}
+.ref-chip{display:inline-flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--accent-border);border-radius:6px;padding:4px 10px;font-size:12px;color:var(--accent);font-weight:500;}
+.ref-chip-remove{cursor:pointer;opacity:0.5;font-size:13px;transition:opacity 0.2s;line-height:1;}
+.ref-chip-remove:hover{opacity:1;}
+.ref-chip-input-field{border:none;outline:none;background:transparent;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:300;flex:1;min-width:130px;}
+.ref-chip-input-field::placeholder{color:rgba(240,237,232,0.18);}
+
+.ref-examples{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px;}
+.ref-example-pill{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:11px;color:var(--muted);cursor:pointer;transition:all 0.2s;}
+.ref-example-pill:hover{border-color:var(--accent-border);color:var(--accent);background:var(--accent-dim);}
+
+.ref-validation{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;display:flex;align-items:flex-start;gap:12px;margin-top:16px;transition:all 0.3s;}
+.ref-validation.valid{border-color:var(--green-border);background:var(--green-dim);}
+.ref-val-icon{font-size:18px;flex-shrink:0;margin-top:1px;}
+.ref-val-text{font-size:13px;color:var(--muted);line-height:1.55;}
+.ref-val-text strong{color:var(--text);}
+.ref-validation.valid .ref-val-text{color:rgba(240,237,232,0.85);}
+
+/* VOICE */
+.voice-zone{background:var(--surface);border:1px dashed rgba(200,240,74,0.22);border-radius:var(--r);padding:24px;display:flex;flex-direction:column;align-items:center;gap:14px;}
+.record-btn{width:64px;height:64px;border-radius:50%;background:var(--accent-dim);border:2px solid var(--accent-border);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;font-size:26px;}
+.record-btn:hover{background:rgba(200,240,74,0.18);transform:scale(1.05);}
+.record-btn.recording{background:rgba(255,79,79,0.12);border-color:rgba(255,79,79,0.35);animation:recPulse 1.2s ease-in-out infinite;}
+@keyframes recPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,79,79,0.3);}50%{box-shadow:0 0 0 14px rgba(255,79,79,0);}}
+.voice-label{font-size:13px;color:var(--muted);}
+.voice-timer{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;color:var(--danger);display:none;}
+.waveform{display:none;align-items:center;gap:3px;height:30px;}
+.waveform-bar{width:3px;background:var(--accent);border-radius:2px;animation:wv 0.8s ease-in-out infinite;}
+.waveform-bar:nth-child(1){animation-delay:0s;}.waveform-bar:nth-child(2){animation-delay:.1s;}.waveform-bar:nth-child(3){animation-delay:.2s;}.waveform-bar:nth-child(4){animation-delay:.3s;}.waveform-bar:nth-child(5){animation-delay:.4s;}.waveform-bar:nth-child(6){animation-delay:.5s;}.waveform-bar:nth-child(7){animation-delay:.4s;}.waveform-bar:nth-child(8){animation-delay:.3s;}.waveform-bar:nth-child(9){animation-delay:.2s;}.waveform-bar:nth-child(10){animation-delay:.1s;}
+@keyframes wv{0%,100%{height:5px;opacity:0.4;}50%{height:26px;opacity:1;}}
+.transcription-label{font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent);font-weight:600;margin-bottom:8px;}
+
+/* AI */
+.ai-screen{text-align:center;padding:40px 0;}
+.ai-orb{width:88px;height:88px;border-radius:50%;background:radial-gradient(circle at 35% 35%,rgba(200,240,74,0.28),transparent 60%),var(--surface);border:1px solid var(--accent-border);margin:0 auto 28px;position:relative;animation:orbF 3s ease-in-out infinite;}
+.ai-orb::before{content:'';position:absolute;inset:-8px;border-radius:50%;border:1px solid rgba(200,240,74,0.12);animation:orbR 2s ease-in-out infinite;}
+.ai-orb::after{content:'a';font-size:30px;color:var(--accent);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
+@keyframes orbF{0%,100%{transform:translateY(0);}50%{transform:translateY(-7px);}}
+@keyframes orbR{0%,100%{transform:scale(1);opacity:0.5;}50%{transform:scale(1.1);opacity:0.12;}}
+.ai-status{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;margin-bottom:10px;}
+.ai-substatus{color:var(--muted);font-size:13px;height:20px;}
+.ai-steps{margin:28px 0;display:flex;flex-direction:column;gap:9px;text-align:left;}
+.ai-step{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--muted);transition:all 0.4s;}
+.ai-step.done{border-color:var(--accent-border);background:var(--accent-dim);color:var(--text);}
+.ai-step.active{border-color:rgba(200,240,74,0.18);color:var(--text);}
+.ai-step-icon{font-size:15px;width:20px;text-align:center;}
+.ai-step-spinner{width:15px;height:15px;border:2px solid rgba(200,240,74,0.18);border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* RESULT */
+.brief-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;gap:14px;}
+.brief-score{display:flex;flex-direction:column;align-items:center;background:var(--accent-dim);border:1px solid var(--accent-border);border-radius:10px;padding:12px 16px;flex-shrink:0;}
+.brief-score-num{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--accent);line-height:1;}
+.brief-score-label{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-top:4px;}
+.brief-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;margin-bottom:9px;}
+.brief-section-label{font-size:10px;text-transform:uppercase;letter-spacing:0.12em;color:var(--accent);font-weight:600;margin-bottom:7px;}
+.brief-section-content{font-size:14px;line-height:1.6;color:rgba(240,237,232,0.85);font-weight:300;}
+.integrations-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:16px 0;}
+.integration-chip{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);transition:all 0.3s;}
+.integration-chip.sent{border-color:var(--green-border);background:var(--green-dim);color:var(--green);}
+.integration-chip.sending{border-color:var(--accent-border);background:var(--accent-dim);color:var(--accent);}
+.integration-icon{font-size:15px;}
+
+@media(max-width:500px){
+  .topbar{padding:16px 20px;}
+  main{padding:24px 16px;}
+  .choice-grid,.option-grid{grid-template-columns:1fr;}
+  .ref-why-grid{grid-template-columns:1fr;}
+  .ref-context-grid{grid-template-columns:1fr 1fr;}
+  .integrations-row{grid-template-columns:1fr;}
+}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<header class="topbar">
+  <div class="logo">ERE<span>.</span></div>
+  <div class="step-indicator">
+    <div class="step-dot active" id="dot-1"></div>
+    <div class="step-dot" id="dot-2"></div>
+    <div class="step-dot" id="dot-3"></div>
+    <div class="step-dot" id="dot-4"></div>
+    <div class="step-dot" id="dot-5"></div>
+  </div>
+</header>
+
+<div class="progress-bar">
+  <div class="progress-fill" id="progress" style="width:8%"></div>
+</div>
+
+<main>
+
+<!-- ══ SCREEN 1 : CHOIX DEPART ══ -->
+<div class="screen active" id="screen-1">
+  <div class="tag"><span class="tag-dot"></span> Bienvenue</div>
+  <h1>Comment voulez-vous<br><em>demarrer ?</em></h1>
+  <p class="sub">Deux chemins, un seul objectif : construire un brief parfait pour lancer votre projet motion design.</p>
+
+  <div class="choice-grid">
+    <div class="choice-card" id="choice-call" onclick="selectStart('call')">
+      <div class="choice-check">v</div>
+      <div class="choice-icon">📞</div>
+      <div><div class="choice-badge badge-rec">Recommande</div></div>
+      <div class="choice-title">Appel + Brief</div>
+      <div class="choice-desc">15 min avec un chef de projet, puis on complete le brief ensemble. Resultat garanti.</div>
+    </div>
+    <div class="choice-card" id="choice-form" onclick="selectStart('form')">
+      <div class="choice-check">v</div>
+      <div class="choice-icon">✍️</div>
+      <div><div class="choice-badge badge-quick">Rapide</div></div>
+      <div class="choice-title">Brief direct</div>
+      <div class="choice-desc">Remplissez seul, sans rendez-vous. Ideal si votre besoin est deja tres clair.</div>
+    </div>
+  </div>
+
+  <div id="explain-call" style="display:none;">
+    <div class="notice notice-info">
+      <span class="notice-icon">💡</span>
+      <span>Vous reserverez un creneau a l'etape suivante. Pendant l'appel, un chef de projet ERE vous guide avant de remplir le brief.</span>
+    </div>
+  </div>
+  <div id="explain-form" style="display:none;">
+    <div class="notice notice-warning">
+      <span class="notice-icon">⚠️</span>
+      <span>Sans appel, le brief doit etre tres precis. <strong>La page References est obligatoire</strong> — c'est ce qui remplace l'echange oral.</span>
+    </div>
+  </div>
+
+  <div class="sep"></div>
+  <button class="btn btn-primary" id="btn-start" onclick="goFromStart()" disabled>Commencer →</button>
+</div>
+
+<!-- ══ SCREEN 2A : BOOKING ══ -->
+<div class="screen" id="screen-2a">
+  <div class="tag"><span class="tag-dot"></span> Etape 1 — Rendez-vous</div>
+  <h1>Reservez votre<br><em>appel strategique</em></h1>
+  <p class="sub">15 minutes avec un chef de projet pour aligner votre vision avant de lancer la production.</p>
+
+  <!-- CAL.COM EMBED OFFICIEL (SDK) -->
+  <div id="cal-embed-zone" style="margin-bottom:20px;">
+    <!-- Le calendrier Cal.com s'injecte ici via le SDK -->
+    <div id="my-cal-inline" style="width:100%;min-height:600px;overflow:scroll;border-radius:var(--r);"></div>
+  </div>
+
+  <!-- CONFIRMATION MANUELLE apres reservation -->
+  <div id="booking-confirm-block" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin-bottom:4px;">
+    <div style="font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.5;">
+      Une fois votre creneau reserve dans le calendrier ci-dessus, cliquez ici pour continuer.
+    </div>
+    <button class="btn btn-primary" id="btn-after-booking" onclick="confirmBooking()" style="background:rgba(200,240,74,0.15);border:1px solid var(--accent-border);color:var(--accent);">
+      ✓ &nbsp; J'ai reserve mon appel — Continuer vers le brief
+    </button>
+  </div>
+
+  <div id="booking-confirmed" style="display:none;margin-top:12px;">
+    <div class="confirmed-badge">✓ &nbsp; Appel confirme — un email de confirmation vous a ete envoye</div>
+  </div>
+
+  <!-- SDK Cal.com embed -->
+  <script type="text/javascript">
+  (function (C, A, L) {
+    let p = function (a, ar) { a.q.push(ar); };
+    let d = C.document;
+    C.Cal = C.Cal || function () {
+      let cal = C.Cal;
+      let ar = arguments;
+      if (!cal.loaded) {
+        cal.ns = {};
+        cal.q = cal.q || [];
+        d.head.appendChild(d.createElement("script")).src = A;
+        cal.loaded = true;
+      }
+      if (ar[0] === L) {
+        const api = function () { p(api, arguments); };
+        const namespace = ar[1];
+        api.q = api.q || [];
+        if (typeof namespace === "string") {
+          cal.ns[namespace] = cal.ns[namespace] || api;
+          p(cal.ns[namespace], ar);
+          p(cal, ["initNamespace", namespace]);
+        } else p(cal, ar);
+        return;
+      }
+      p(cal, ar);
+    };
+  })(window, "https://app.cal.com/embed/embed.js", "init");
+
+  Cal("init", { origin: "https://cal.com" });
+
+  Cal("inline", {
+    elementOrSelector: "#my-cal-inline",
+    calLink: "ere-agency/commande-client",
+    layout: "month_view",
+    config: {
+      theme: "dark",
+      brandColor: "#c8f04a"
+    }
+  });
+
+  Cal("ui", {
+    theme: "dark",
+    styles: { branding: { brandColor: "#c8f04a" } },
+    hideEventTypeDetails: false
+  });
+
+  // Detection automatique apres reservation Cal.com
+  Cal("on", {
+    action: "bookingSuccessful",
+    callback: function() {
+      document.getElementById('booking-confirm-block').style.display = 'none';
+      document.getElementById('booking-confirmed').style.display = 'block';
+      setTimeout(function(){ goToStep('q1'); }, 1800);
+    }
+  });
+  </script>
+</div>
+
+<!-- ══ SCREEN Q1 : OBJECTIF ══ -->
+<div class="screen" id="screen-q1">
+  <div class="question-meta">
+    <span class="question-num">Question 1</span>
+    <span class="question-count">1 / 4</span>
+  </div>
+  <h2 class="question-text">Quel est l'objectif<br>principal de cette video ?</h2>
+  <p class="question-hint">Ce que vous voulez que le spectateur fasse ou ressente.</p>
+
+  <div class="option-grid">
+    <div class="option-card" onclick="selectOption(this)"><span class="option-emoji">🚀</span> Notoriete / Lancement<span class="option-check">✓</span></div>
+    <div class="option-card" onclick="selectOption(this)"><span class="option-emoji">💼</span> Vente / Conversion<span class="option-check">✓</span></div>
+    <div class="option-card" onclick="selectOption(this)"><span class="option-emoji">🎓</span> Formation / Explication<span class="option-check">✓</span></div>
+    <div class="option-card" onclick="selectOption(this)"><span class="option-emoji">✨</span> Image de marque<span class="option-check">✓</span></div>
+  </div>
+
+  <div class="form-nav">
+    <button class="btn-back" onclick="goBack()">←</button>
+    <button class="btn btn-primary" onclick="goToStep('q2')" style="flex:1;">Suivant →</button>
+  </div>
+</div>
+
+<!-- ══ SCREEN Q2 : AUDIENCE ══ -->
+<div class="screen" id="screen-q2">
+  <div class="question-meta">
+    <span class="question-num">Question 2</span>
+    <span class="question-count">2 / 4</span>
+  </div>
+  <h2 class="question-text">Qui est votre<br>audience cible ?</h2>
+  <p class="question-hint">Secteur, age, poste, habitudes. Soyez precis.</p>
+
+  <div class="input-tabs">
+    <div class="input-tab active" onclick="switchTab(this,'text','q2')">✍️ Texte</div>
+    <div class="input-tab" onclick="switchTab(this,'voice','q2')">🎙️ Voix</div>
+  </div>
+
+  <div id="q2-text-input">
+    <textarea class="answer-textarea" id="q2-text" placeholder="Ex : Directeurs marketing de PME tech (10-50 salaries), 30-45 ans, actifs sur LinkedIn..." rows="5"></textarea>
+  </div>
+  <div id="q2-voice-input" style="display:none;">
+    <div class="voice-zone">
+      <div class="waveform" id="q2-waveform">
+        <div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div>
+      </div>
+      <div class="voice-timer" id="q2-timer">0:00</div>
+      <div class="record-btn" id="q2-record-btn" onclick="toggleRecording('q2')">🎙️</div>
+      <div class="voice-label" id="q2-voice-label">Appuyez pour enregistrer</div>
+    </div>
+    <div id="q2-transcription" style="display:none;margin-top:14px;">
+      <div class="transcription-label">Transcription IA</div>
+      <textarea class="answer-textarea" id="q2-transcribed" rows="4"></textarea>
+    </div>
+  </div>
+
+  <div class="form-nav">
+    <button class="btn-back" onclick="goToStep('q1')">←</button>
+    <button class="btn btn-primary" onclick="goToStep('q3')" style="flex:1;">Suivant →</button>
+  </div>
+</div>
+
+<!-- ══ SCREEN Q3 : DETAILS ══ -->
+<div class="screen" id="screen-q3">
+  <div class="question-meta">
+    <span class="question-num">Questions 3 – 4</span>
+    <span class="question-count">3–4 / 4</span>
+  </div>
+  <h2 class="question-text">Message & format</h2>
+  <p class="question-hint">Les elements techniques qui cadrent la production.</p>
+
+  <div style="display:flex;flex-direction:column;gap:16px;">
+    <div>
+      <div class="ref-input-label" style="margin-bottom:8px;">Message cle</div>
+      <textarea class="answer-textarea" style="min-height:80px;" placeholder="La phrase que le client doit retenir apres avoir vu la video..."></textarea>
+    </div>
+    <div>
+      <div class="ref-input-label" style="margin-bottom:8px;">Format et duree</div>
+      <div class="option-grid" style="grid-template-columns:repeat(3,1fr);">
+        <div class="option-card" style="flex-direction:column;align-items:flex-start;gap:4px;" onclick="selectOption(this)"><span>⚡</span><span style="font-size:12px;font-weight:600;">15-30s</span><span class="option-check">✓</span></div>
+        <div class="option-card" style="flex-direction:column;align-items:flex-start;gap:4px;" onclick="selectOption(this)"><span>🎬</span><span style="font-size:12px;font-weight:600;">60-90s</span><span class="option-check">✓</span></div>
+        <div class="option-card" style="flex-direction:column;align-items:flex-start;gap:4px;" onclick="selectOption(this)"><span>🎞️</span><span style="font-size:12px;font-weight:600;">2-3 min</span><span class="option-check">✓</span></div>
+      </div>
+    </div>
+    <div>
+      <div class="ref-input-label" style="margin-bottom:8px;">Deadline souhaitee</div>
+      <textarea class="answer-textarea" style="min-height:60px;" placeholder="Ex : dans 3 semaines, avant le 15 mai, sans contrainte..."></textarea>
+    </div>
+  </div>
+
+  <div class="form-nav">
+    <button class="btn-back" onclick="goToStep('q2')">←</button>
+    <button class="btn btn-primary" onclick="goToStep('refs')" style="flex:1;">Suivant — References →</button>
+  </div>
+</div>
+
+<!-- ══ SCREEN REFS : REFERENCES (OBLIGATOIRE) ══ -->
+<div class="screen" id="screen-refs">
+  <div class="tag tag-warn"><span class="tag-dot"></span> Etape obligatoire</div>
+
+  <h1>Vos <em>references</em><br>visuelles</h1>
+  <p class="sub">La page la plus importante du formulaire. Sans elle, on travaille a l'aveugle.</p>
+
+  <!-- BANNIERE CRITIQUE -->
+  <div class="ref-mandatory-banner">
+    <div class="ref-mandatory-title">
+      Pourquoi c'est critique
+      <span class="badge-critical">Obligatoire</span>
+    </div>
+    <div class="ref-mandatory-body">
+      Le motion design est un art <strong>subjectif</strong>. Deux clients qui disent "moderne et premium" peuvent vouloir deux univers completement opposes.<br><br>
+      Les references sont le seul langage universel entre vous et notre equipe de production. <strong>Sans elles : risque de hors-sujet, allers-retours, delais.</strong><br><br>
+      Les clients qui fournissent des references solides <strong>valident leur video a 80% au premier jet.</strong>
+    </div>
+  </div>
+
+  <!-- POURQUOI CA CHANGE TOUT -->
+  <div class="ref-why-grid">
+    <div class="ref-why-card">
+      <div class="ref-why-icon">🎯</div>
+      <div class="ref-why-title">Direction precise</div>
+      <div class="ref-why-desc">L'equipe sait exactement ou aller des le premier rendu</div>
+    </div>
+    <div class="ref-why-card">
+      <div class="ref-why-icon">⚡</div>
+      <div class="ref-why-title">2x plus vite</div>
+      <div class="ref-why-desc">Moins d'allers-retours = livraison acceleree</div>
+    </div>
+    <div class="ref-why-card">
+      <div class="ref-why-icon">✅</div>
+      <div class="ref-why-title">Valide du 1er coup</div>
+      <div class="ref-why-desc">80% de validation au premier jet avec de bonnes refs</div>
+    </div>
+  </div>
+
+  <div class="sep" style="margin:18px 0;"></div>
+
+  <!-- QUEL ASPECT VOUS INSPIRE -->
+  <div class="ref-input-label" style="margin-bottom:10px;">Quel aspect vous inspire dans ces references ?</div>
+  <div class="ref-context-grid" id="ref-context">
+    <div class="ref-context-card" onclick="selectContext(this)"><div class="ref-context-icon">🎨</div><div class="ref-context-label">Style visuel</div></div>
+    <div class="ref-context-card" onclick="selectContext(this)"><div class="ref-context-icon">⚡</div><div class="ref-context-label">Rythme / Energie</div></div>
+    <div class="ref-context-card" onclick="selectContext(this)"><div class="ref-context-icon">🎵</div><div class="ref-context-label">Ambiance sonore</div></div>
+    <div class="ref-context-card" onclick="selectContext(this)"><div class="ref-context-icon">✍️</div><div class="ref-context-label">Typographie</div></div>
+    <div class="ref-context-card" onclick="selectContext(this)"><div class="ref-context-icon">🌈</div><div class="ref-context-label">Palette couleurs</div></div>
+    <div class="ref-context-card" onclick="selectContext(this)"><div class="ref-context-icon">📐</div><div class="ref-context-label">Structure / Layout</div></div>
+  </div>
+
+  <div class="sep" style="margin:18px 0;"></div>
+
+  <!-- REFS INPUT -->
+  <div class="ref-input-label">
+    References visuelles (videos, marques, campagnes)
+    <span class="ref-counter" id="refs-counter">0 / min. 2</span>
+  </div>
+  <div class="ref-chips-input" id="refs-chips-zone" onclick="document.getElementById('refs-chip-input').focus()">
+    <div id="refs-chips-list" style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;"></div>
+    <input class="ref-chip-input-field" id="refs-chip-input" placeholder="Coller un lien ou taper un nom..." onkeydown="handleRefInput(event)">
+  </div>
+  <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Appuyez sur Entree pour valider chaque reference</div>
+
+  <div style="font-size:11px;color:var(--muted);margin-bottom:8px;font-weight:500;">Exemples rapides :</div>
+  <div class="ref-examples">
+    <div class="ref-example-pill" onclick="addRefExample('Apple — Shot on iPhone')">Apple</div>
+    <div class="ref-example-pill" onclick="addRefExample('Linear App')">Linear</div>
+    <div class="ref-example-pill" onclick="addRefExample('Stripe — Brand video')">Stripe</div>
+    <div class="ref-example-pill" onclick="addRefExample('Notion Explainer')">Notion</div>
+    <div class="ref-example-pill" onclick="addRefExample('Airbnb Campaign')">Airbnb</div>
+    <div class="ref-example-pill" onclick="addRefExample('Nike — Short film')">Nike</div>
+    <div class="ref-example-pill" onclick="addRefExample('Figma — Launch video')">Figma</div>
+  </div>
+
+  <div class="sep" style="margin:20px 0;"></div>
+
+  <!-- CE QU'ON EVITE -->
+  <div class="ref-input-label" style="margin-bottom:8px;">Ce que vous voulez absolument eviter</div>
+  <textarea class="answer-textarea" id="ref-avoid" style="min-height:80px;" placeholder="Styles, couleurs, approches a proscrire... (ex : pas de stock footage, pas de 3D realiste, eviter le bleu corporate)"></textarea>
+
+  <!-- ETAT VALIDATION -->
+  <div class="ref-validation" id="ref-validation">
+    <div class="ref-val-icon">⏳</div>
+    <div class="ref-val-text">Ajoutez au moins <strong>2 references</strong> et selectionnez <strong>1 aspect</strong> pour continuer.</div>
+  </div>
+
+  <div class="form-nav">
+    <button class="btn-back" onclick="goToStep('q3')">←</button>
+    <button class="btn btn-primary" id="btn-refs-next" onclick="startAI()" style="flex:1;" disabled>Generer le brief ✦</button>
+  </div>
+</div>
+
+<!-- ══ SCREEN AI ══ -->
+<div class="screen" id="screen-ai">
+  <div class="ai-screen">
+    <div class="ai-orb"></div>
+    <h2 class="ai-status">Traitement IA en cours</h2>
+    <p class="ai-substatus" id="ai-substatus">Analyse de vos reponses</p>
+    <div class="ai-steps">
+      <div class="ai-step" id="ai-step-1"><div class="ai-step-icon">✦</div><span>Reformulation et nettoyage des reponses</span></div>
+      <div class="ai-step" id="ai-step-2"><div class="ai-step-icon">✦</div><span>Extraction des informations cles</span></div>
+      <div class="ai-step" id="ai-step-3"><div class="ai-step-icon">✦</div><span>Analyse des references visuelles</span></div>
+      <div class="ai-step" id="ai-step-4"><div class="ai-step-icon">✦</div><span>Generation du brief structure</span></div>
+      <div class="ai-step" id="ai-step-5"><div class="ai-step-icon">✦</div><span>Scoring qualite + envoi Sheets et Slides</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SCREEN RESULT ══ -->
+<div class="screen" id="screen-result">
+  <div class="tag"><span class="tag-dot"></span> Brief genere avec succes</div>
+
+  <div class="brief-header">
+    <div>
+      <h1 style="font-size:clamp(22px,4vw,32px);margin-bottom:8px;">Votre brief<br><em>est pret</em></h1>
+      <p class="sub" style="margin-bottom:0;">Structure, relu et transmis a l'equipe production.</p>
+    </div>
+    <div class="brief-score">
+      <div class="brief-score-num">91</div>
+      <div class="brief-score-label">Score / 100</div>
+    </div>
+  </div>
+
+  <div class="brief-section">
+    <div class="brief-section-label">Objectif</div>
+    <div class="brief-section-content">Generer des conversions directes aupres d'une cible decisionnaire B2B via une video courte et impactante, pensee pour un usage LinkedIn et presentations commerciales.</div>
+  </div>
+  <div class="brief-section">
+    <div class="brief-section-label">Audience cible</div>
+    <div class="brief-section-content">Directeurs marketing et responsables communication de PME tech (10-50 salaries), 30-45 ans, actifs sur LinkedIn. Exigeants sur la qualite visuelle.</div>
+  </div>
+  <div class="brief-section">
+    <div class="brief-section-label">Message cle</div>
+    <div class="brief-section-content">Votre image merite une production qui vous ressemble, sans les contraintes d'une grande agence.</div>
+  </div>
+  <div class="brief-section">
+    <div class="brief-section-label">Direction creative (basee sur vos references)</div>
+    <div class="brief-section-content">Inspire de Linear et Stripe : motion design epure, typographie forte, transitions fluides. Palette sombre avec accentuation couleur unique. Rythme dynamique sans agressivite.</div>
+  </div>
+  <div class="brief-section">
+    <div class="brief-section-label">A eviter absolument</div>
+    <div class="brief-section-content">Pas de stock footage, pas de 3D realiste, eviter le bleu corporate generique.</div>
+  </div>
+  <div class="brief-section">
+    <div class="brief-section-label">Livrable</div>
+    <div class="brief-section-content">Format 60-90 secondes · 16:9 + version 9:16 · Deadline : dans 3 semaines</div>
+  </div>
+
+  <div class="sep"></div>
+  <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:12px;font-weight:600;">Integrations automatiques</div>
+  <div class="integrations-row">
+    <div class="integration-chip" id="chip-sheets"><span class="integration-icon">📊</span> Google Sheets</div>
+    <div class="integration-chip" id="chip-slides"><span class="integration-icon">🖼️</span> Google Slides</div>
+    <div class="integration-chip" id="chip-make"><span class="integration-icon">⚡</span> Make.com</div>
+  </div>
+
+  <div style="padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:16px;">
+    L'equipe ERE a ete notifiee. Un chef de projet vous contactera sous <strong style="color:var(--text);">24h ouvrees</strong>.
+  </div>
+
+  <button class="btn btn-primary" onclick="alert('Brief telecharge')">Telecharger le brief PDF</button>
+</div>
+
+</main>
+</div>
+
+<script>
+var startMode = null;
+var currentScreen = '1';
+var recordings = {};
+var timers = {};
+var refs = [];
+var selectedContexts = 0;
+
+var progressMap = {'1':8,'2a':22,'q1':36,'q2':50,'q3':64,'refs':78,'ai':90,'result':100};
+var dotMap = {'1':1,'2a':2,'q1':2,'q2':3,'q3':3,'refs':4,'ai':5,'result':5};
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  var el = document.getElementById('screen-'+id);
+  if(el) el.classList.add('active');
+  currentScreen = id;
+  document.getElementById('progress').style.width = (progressMap[id] || 8)+'%';
+  var dot = dotMap[id] || 1;
+  for(var i=1;i<=5;i++){
+    var d = document.getElementById('dot-'+i);
+    if(!d) continue;
+    d.className = 'step-dot';
+    if(i < dot) d.classList.add('done');
+    else if(i===dot) d.classList.add('active');
+  }
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function goToStep(id){ showScreen(id); }
+
+function goBack(){
+  if(currentScreen==='q1'){
+    showScreen(startMode==='call' ? '2a' : '1');
+  }
+}
+
+function selectStart(mode){
+  startMode = mode;
+  document.getElementById('choice-call').classList.toggle('selected', mode==='call');
+  document.getElementById('choice-form').classList.toggle('selected', mode==='form');
+  document.getElementById('explain-call').style.display = mode==='call' ? 'block' : 'none';
+  document.getElementById('explain-form').style.display = mode==='form' ? 'block' : 'none';
+  var btn = document.getElementById('btn-start');
+  btn.disabled = false;
+}
+
+function goFromStart(){
+  showScreen(startMode==='call' ? '2a' : 'q1');
+}
+
+function confirmBooking(){
+  var btn = document.getElementById('btn-after-booking');
+  btn.innerHTML = '<div class="ai-step-spinner" style="border-color:rgba(200,240,74,0.3);border-top-color:var(--accent);"></div>';
+  btn.style.pointerEvents = 'none';
+  setTimeout(function(){
+    document.getElementById('booking-confirmed').style.display = 'block';
+    btn.style.display = 'none';
+    setTimeout(function(){ goToStep('q1'); }, 1200);
+  }, 900);
+}
+
+function selectOption(el){
+  var grid = el.closest('.option-grid');
+  grid.querySelectorAll('.option-card').forEach(function(o){ o.classList.remove('selected'); });
+  el.classList.add('selected');
+}
+
+function switchTab(tab, mode, qid){
+  tab.closest('.input-tabs').querySelectorAll('.input-tab').forEach(function(t){ t.classList.remove('active'); });
+  tab.classList.add('active');
+  document.getElementById(qid+'-text-input').style.display = mode==='text' ? 'block' : 'none';
+  document.getElementById(qid+'-voice-input').style.display = mode==='voice' ? 'block' : 'none';
+}
+
+function toggleRecording(qid){
+  var btn = document.getElementById(qid+'-record-btn');
+  var label = document.getElementById(qid+'-voice-label');
+  var timer = document.getElementById(qid+'-timer');
+  var waveform = document.getElementById(qid+'-waveform');
+  if(!recordings[qid]){
+    recordings[qid] = true;
+    btn.classList.add('recording');
+    btn.textContent = 'STOP';
+    btn.style.fontSize = '11px';
+    btn.style.fontWeight = '700';
+    label.textContent = 'Enregistrement en cours';
+    timer.style.display = 'block';
+    waveform.style.display = 'flex';
+    var secs = 0;
+    timers[qid] = setInterval(function(){
+      secs++;
+      var m = Math.floor(secs/60);
+      var s = secs%60;
+      timer.textContent = m+':'+(s<10?'0':'')+s;
+    },1000);
+  } else {
+    recordings[qid] = false;
+    clearInterval(timers[qid]);
+    btn.classList.remove('recording');
+    btn.textContent = 'MIC';
+    btn.style.fontSize = '11px';
+    label.textContent = 'Transcription en cours...';
+    timer.style.display = 'none';
+    waveform.style.display = 'none';
+    setTimeout(function(){
+      label.textContent = 'Transcription terminee';
+      var ta = document.getElementById(qid+'-transcription');
+      var tx = document.getElementById(qid+'-transcribed');
+      ta.style.display = 'block';
+      tx.value = "Directeurs marketing de PME tech entre 10 et 50 salaries, actifs sur LinkedIn, entre 30 et 45 ans. Ils cherchent une communication professionnelle mais agile.";
+    },1800);
+  }
+}
+
+function selectContext(el){
+  el.classList.toggle('selected');
+  selectedContexts = document.querySelectorAll('#ref-context .ref-context-card.selected').length;
+  checkRefsValid();
+}
+
+function handleRefInput(e){
+  if(e.key==='Enter'){
+    e.preventDefault();
+    var val = e.target.value.trim();
+    if(val.length>0){ addRef(val); e.target.value=''; }
+  }
+}
+
+function addRef(val){
+  refs.push(val);
+  renderRefs();
+  checkRefsValid();
+}
+
+function addRefExample(val){
+  if(refs.indexOf(val)===-1) addRef(val);
+}
+
+function removeRef(idx){
+  refs.splice(idx,1);
+  renderRefs();
+  checkRefsValid();
+}
+
+function renderRefs(){
+  var list = document.getElementById('refs-chips-list');
+  list.innerHTML = '';
+  refs.forEach(function(r,i){
+    var chip = document.createElement('div');
+    chip.className = 'ref-chip';
+    chip.innerHTML = r + '<span class="ref-chip-remove" onclick="removeRef('+i+')">x</span>';
+    list.appendChild(chip);
+  });
+  var counter = document.getElementById('refs-counter');
+  counter.textContent = refs.length+' / min. 2';
+  counter.className = 'ref-counter'+(refs.length>=2 ? ' ok' : '');
+}
+
+function checkRefsValid(){
+  var ok = refs.length>=2 && selectedContexts>=1;
+  var valBox = document.getElementById('ref-validation');
+  var valIcon = valBox.querySelector('.ref-val-icon');
+  var valText = valBox.querySelector('.ref-val-text');
+  var btn = document.getElementById('btn-refs-next');
+  if(ok){
+    valBox.classList.add('valid');
+    valIcon.textContent = 'ok';
+    valText.innerHTML = 'Parfait. Votre brief sera <strong>directement exploitable</strong> par l\'equipe production.';
+    btn.disabled = false;
+  } else {
+    valBox.classList.remove('valid');
+    valIcon.textContent = 'wait';
+    var missing = [];
+    if(refs.length<2) missing.push('<strong>'+(2-refs.length)+' reference(s) manquante(s)</strong>');
+    if(selectedContexts<1) missing.push('<strong>1 aspect a selectionner</strong>');
+    valText.innerHTML = 'Il manque encore : '+missing.join(' et ')+'.';
+    btn.disabled = true;
+  }
+}
+
+function startAI(){
+  showScreen('ai');
+  var steps = ['ai-step-1','ai-step-2','ai-step-3','ai-step-4','ai-step-5'];
+  var labels = ['Reformulation...','Extraction des cles...','Analyse des references...','Structuration du brief...','Envoi Sheets et Slides...'];
+  var i = 0;
+  function runStep(){
+    if(i>=steps.length){ setTimeout(function(){ showScreen('result'); animateIntegrations(); },700); return; }
+    var el = document.getElementById(steps[i]);
+    el.classList.add('active');
+    el.querySelector('.ai-step-icon').innerHTML = '<div class="ai-step-spinner"></div>';
+    document.getElementById('ai-substatus').textContent = labels[i];
+    setTimeout(function(){
+      el.classList.remove('active');
+      el.classList.add('done');
+      el.querySelector('.ai-step-icon').textContent = 'ok';
+      i++;
+      setTimeout(runStep,280);
+    }, 850+Math.random()*250);
+  }
+  setTimeout(runStep,500);
+}
+
+function animateIntegrations(){
+  var chips = [{id:'chip-sheets',delay:400},{id:'chip-slides',delay:1100},{id:'chip-make',delay:1800}];
+  chips.forEach(function(c){
+    setTimeout(function(){
+      var el = document.getElementById(c.id);
+      el.classList.add('sending');
+      setTimeout(function(){
+        el.classList.remove('sending');
+        el.classList.add('sent');
+        el.querySelector('.integration-icon').textContent = 'ok';
+      },700);
+    },c.delay);
+  });
+}
+</script>
+</body>
+</html>
